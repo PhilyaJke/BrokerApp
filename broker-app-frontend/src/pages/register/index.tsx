@@ -1,8 +1,8 @@
-import {Card, Form, Input, Button, message} from 'antd';
-import { useFormik } from 'formik';
+import {Button, Card, Form, Input, message} from 'antd';
+import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import { useAuth } from '../../providers/authProvider';
-import {Navigate} from "react-router-dom";
+import {useAuth} from '../../providers/authProvider';
+import {Navigate, useNavigate} from "react-router-dom";
 import {useState} from "react";
 
 const initialValues = {
@@ -24,8 +24,12 @@ const validationSchema = Yup.object().shape({
 });
 
 const RegisterPage = () => {
-    const { register, isAuth } = useAuth();
+    const {register, isAuth} = useAuth();
     const [error, setError] = useState('');
+    const navigate = useNavigate();
+    if (isAuth()) {
+        return <Navigate to={'/profile'}/>;
+    }
     const formik = useFormik({
         initialValues,
         validationSchema,
@@ -36,7 +40,7 @@ const RegisterPage = () => {
                 console.log(res);
                 if (res.status === 'ok') {
                     console.log(res);
-                    return <Navigate to={'/profile'} />;
+                    return navigate('/profile');
                 } else {
                     setError(res.message);
                     message.error(error);
@@ -51,42 +55,42 @@ const RegisterPage = () => {
     });
 
     return (
-            <Card>
-                <Form onFinish={formik.handleSubmit}>
-                    <h3>Регистрация</h3>
-                    {error && <code>{error}</code>}
-                    <Form.Item
-                        label="Username"
-                        name="username"
-                        validateStatus={formik.errors.username ? 'error' : ''}
-                        help={formik.errors.username ? formik.errors.username : null}
-                    >
-                        <Input name="username" value={formik.values.username} onChange={formik.handleChange} />
-                    </Form.Item>
+        <Card>
+            <Form onFinish={formik.handleSubmit}>
+                <h3>Регистрация</h3>
+                {error && <code>{error}</code>}
+                <Form.Item
+                    label="Username"
+                    name="username"
+                    validateStatus={formik.errors.username ? 'error' : ''}
+                    help={formik.errors.username ? formik.errors.username : null}
+                >
+                    <Input name="username" value={formik.values.username} onChange={formik.handleChange}/>
+                </Form.Item>
 
-                    <Form.Item
-                        label="Password"
-                        name="password"
-                        validateStatus={formik.errors.password ? 'error' : ''}
-                        help={formik.errors.password ? formik.errors.password : null}
-                    >
-                        <Input.Password name="password" value={formik.values.password} onChange={formik.handleChange} />
-                    </Form.Item>
+                <Form.Item
+                    label="Password"
+                    name="password"
+                    validateStatus={formik.errors.password ? 'error' : ''}
+                    help={formik.errors.password ? formik.errors.password : null}
+                >
+                    <Input.Password name="password" value={formik.values.password} onChange={formik.handleChange}/>
+                </Form.Item>
 
-                    <Form.Item
-                        label="Email"
-                        name="email"
-                        validateStatus={formik.errors.email ? 'error' : ''}
-                        help={formik.errors.email ? formik.errors.email : null}
-                    >
-                        <Input name="email" value={formik.values.email} onChange={formik.handleChange} />
-                    </Form.Item>
+                <Form.Item
+                    label="Email"
+                    name="email"
+                    validateStatus={formik.errors.email ? 'error' : ''}
+                    help={formik.errors.email ? formik.errors.email : null}
+                >
+                    <Input name="email" value={formik.values.email} onChange={formik.handleChange}/>
+                </Form.Item>
 
-                    <Button type="primary" htmlType="submit" disabled={formik.isSubmitting}>
-                        Регистрация
-                    </Button>
-                </Form>
-            </Card>
+                <Button type="primary" htmlType="submit" disabled={formik.isSubmitting}>
+                    Регистрация
+                </Button>
+            </Form>
+        </Card>
     );
 };
 

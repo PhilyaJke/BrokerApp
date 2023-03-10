@@ -1,5 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import jwtDecode from "jwt-decode";
+
 const config = {
     authUrl: 'http://localhost:1337',
     refreshTokenLocalStorageKey: 'ref_t'
@@ -57,7 +58,7 @@ const AuthContext = createContext<Context>({
 });
 
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [refreshToken, setRefreshToken] = useState<string | null>(localStorage.getItem(config.refreshTokenLocalStorageKey) || null);
     const [isReady, setIsReady] = useState<boolean>(false);
@@ -68,17 +69,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             refreshAccessToken(accessTokenFromLS)
                 .then((accessTokenStatus: string) => {
                     if (accessTokenStatus === 'ok') {
-                        setAccessToken(accessTokenFromLS);
+                        setRefreshToken(accessTokenFromLS);
                     } else {
-                        setAccessToken(null);
+                        setRefreshToken(null);
                     }
                 })
                 .catch(() => {
-                    setAccessToken(null);
+                    setRefreshToken(null);
                 })
                 .finally(() => {
-                    setIsReady(true);
-                }
+                        setIsReady(true);
+                    }
                 );
         }
     }, []);
@@ -96,7 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ refreshToken }),
+                body: JSON.stringify({refreshToken}),
             });
             if (!response.ok) {
                 return ('error');
@@ -113,8 +114,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
 
-
-
     //auto refresh access token every XX minutes if user is logged in
     useEffect(() => {
         const refreshTokenFromLS = localStorage.getItem(config.refreshTokenLocalStorageKey);
@@ -124,8 +123,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         const expirationTime = jwtDecode<{ exp: number }>(accessToken).exp;
-        console.log('expirationTime',  expirationTime - Date.now());
-        const refreshTime = (expirationTime - Date.now())  * 0.9; //рассчитываем время до обновления токена в мс (90% от времени жизни токена)
+        console.log('expirationTime', expirationTime - Date.now());
+        console.log('Date.now()', Date.now(), expirationTime);
+        const refreshTime = (expirationTime - Date.now()) * 0.9; //рассчитываем время до обновления токена в мс (90% от времени жизни токена)
         console.log('refreshTime', refreshTime);
         const interval = setInterval(() => {
             refreshAccessToken(refreshTokenFromLS || '');
@@ -133,8 +133,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         return () => clearInterval(interval);
     }, [accessToken]);
-
-
 
 
     async function login(props: LoginReq): Promise<contextRes> {
@@ -148,32 +146,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             });
 
             if (response.status === 500) {
-                return { status: 'error', message: 'Сервис временно недоступен' };
+                return {status: 'error', message: 'Сервис временно недоступен'};
             }
 
             const data: AuthRes = await response.json();
 
             if (!data.refreshToken) {
-                return { status: 'error', message: 'Неверный логин или пароль' };
+                return {status: 'error', message: 'Неверный логин или пароль'};
             }
 
             setRefreshToken(data.refreshToken);
             setAccessToken(data.accessToken);
-            return { status: 'ok', message: 'ok' };
+            return {status: 'ok', message: 'ok'};
         } catch (error) {
             console.error(`Failed to login: ${error}`);
 
-            return { status: 'error', message: 'Сервис временно недоступен' };
+            return {status: 'error', message: 'Сервис временно недоступен'};
         }
     }
-
 
 
     const logout = async () => {
         setAccessToken(null);
         setRefreshToken(null);
         localStorage.removeItem(config.refreshTokenLocalStorageKey);
-        await fetch(config.authUrl + "/api/auth/logout", {
+        await fetch(config.authUrl + "/api  /auth/logout", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -191,50 +188,53 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 },
                 body: JSON.stringify(props),
             });
+
             if (response.status === 500) {
-                return { status: 'error', message: 'Сервис временно недоступен' };
+                return {status: 'error', message: 'Сервис временно недоступен'};
             }
             const data: AuthRes = await response.json();
+
             if (!data.refreshToken) {
-                return { status: 'error', message: 'Ошибка регистрации' };
+                return {status: 'error', message: 'Неверный логин или пароль'};
             }
+
             setRefreshToken(data.refreshToken);
-            return { status: 'ok', message: 'ok' };
+            setAccessToken(data.accessToken);
+            return {status: 'ok', message: 'ok'};
         } catch (error) {
-            console.error(`Failed to register: ${error}`);
-            // @ts-ignore
-            return { status: 'error', message: 'Сервис временно недоступен' };
+            console.error(`Failed to reg: ${error}`);
+
+            return {status: 'error', message: 'Сервис временно недоступен'};
         }
     };
 
 
-        const getAccessToken = () => {
-            return accessToken;
-        }
+    const getAccessToken = () => {
+        return accessToken;
+    }
 
-        const isAuth = (): boolean => {
-            if (!accessToken) {
-                return false;
-            }
-            const expirationTime = jwtDecode<{ exp: number }>(accessToken).exp;
-            return Date.now() < expirationTime * 1000;
+    const isAuth = (): boolean => {
+        if (!accessToken) {
+            return false;
         }
+        const expirationTime = jwtDecode<{ exp: number }>(accessToken).exp;
+        return Date.now() < expirationTime * 1000;
+    }
 
-        const value: Context = {
-            login,
-            register,
-            logout,
-            getAccessToken,
-            isAuth,
-            isReady,
-        };
-        return (
-            <AuthContext.Provider value={value}>
-                {children}
-            </AuthContext.Provider>
-        );
+    const value: Context = {
+        login,
+        register,
+        logout,
+        getAccessToken,
+        isAuth,
+        isReady,
     };
-
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
+};
 
 
 export const useAuth = () => useContext(AuthContext);

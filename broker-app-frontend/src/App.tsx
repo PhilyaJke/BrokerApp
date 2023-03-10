@@ -1,17 +1,12 @@
 import AuthPage from "./pages/auth";
-import {
-    Route,
-    Routes
-} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import RegisterPage from "./pages/register";
 import {MainPage} from "./pages/main/index.";
-import styled from "styled-components";
 import {ProfilePage} from "./pages/profile";
 import {useAuth} from "./providers/authProvider";
-import {Suspense} from "react";
 import {Spin} from "antd";
-const App = () =>
-{
+
+const App = () => {
     const {isReady} = useAuth();
     //if not ready, show loading and check again after 300ms
     if (!isReady) {

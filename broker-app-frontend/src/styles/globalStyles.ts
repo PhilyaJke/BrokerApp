@@ -1,5 +1,5 @@
-import { createGlobalStyle } from 'styled-components';
-import { darkTheme } from './themes/dark.theme';
+import {createGlobalStyle} from 'styled-components';
+import {darkTheme} from './themes/dark.theme';
 
 export const GlobalStyle = createGlobalStyle`
   :root {
@@ -18,18 +18,18 @@ export const GlobalStyle = createGlobalStyle`
   button, input, li, image {
     all: unset;
   }
-  
-    body {
-        padding: 4px;
-        max-width: 1440px;
-        margin: 0 auto;
-        min-height: 100vh;
-        display: flex;
-        background: ${darkTheme.colors.primary};
-        color: ${darkTheme.colors.primaryText};
-        font-family: 'Rubik', sans-serif;
-        
-        @media (min-width: 768px) {
-        }
+
+  body {
+    padding: 4px;
+    max-width: 1440px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    background: ${darkTheme.colors.primary};
+    color: ${darkTheme.colors.primaryText};
+    font-family: 'Rubik', sans-serif;
+
+    @media (min-width: 768px) {
     }
+  }
 `;

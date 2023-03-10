@@ -1,5 +1,3 @@
-import styled from "styled-components";
-
 export const darkTheme = {
     colors: {
         primary: "#121212",
