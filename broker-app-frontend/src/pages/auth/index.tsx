@@ -37,7 +37,7 @@ const AuthPage = () => {
                 console.log(res);
                 if (res.status === 'ok') {
                     console.log(res);
-                    return navigate('/main');
+                    return navigate('/profile');
                 } else {
                     message.error(res.message);
                 }
