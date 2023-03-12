@@ -2,7 +2,7 @@ import React, {createContext, useContext, useEffect, useState} from "react";
 import jwtDecode from "jwt-decode";
 
 const config = {
-    authUrl: 'http://localhost:1337',
+    authUrl: 'http://localhost:8080',
     refreshTokenLocalStorageKey: 'ref_t'
 }
 
@@ -97,11 +97,11 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     const refreshAccessToken = async (refreshToken: string): Promise<string> => {
         try {
             const response = await fetch(`${config.authUrl}/api/auth/updateaccesstoken`, {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({refreshToken}),
+                    'Authorization': `Bearer ${refreshToken}`
+                }
             });
             if (!response.ok) {
                 return ('error');
@@ -174,18 +174,18 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         setAccessToken(null);
         setRefreshToken(null);
         localStorage.removeItem(config.refreshTokenLocalStorageKey);
-        await fetch(config.authUrl + "/api  /auth/logout", {
-            method: "POST",
+        await fetch(config.authUrl + "/api/auth/logout", {
+            method: "GET",
             headers: {
+                "Authorization": `Bearer ${refreshToken}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({})
         })
     }
 
     const register = async (props: registerReq): Promise<contextRes> => {
         try {
-            const response = await fetch(`${config.authUrl}/api/auth/register`, {
+            const response = await fetch(`${config.authUrl}/api/auth/registration`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -222,7 +222,7 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
             return false;
         }
         const expirationTime = jwtDecode<{ exp: number }>(accessToken).exp;
-        return Date.now() < expirationTime * 1000;
+        return Date.now() < expirationTime;
     }
 
     const value: Context = {
