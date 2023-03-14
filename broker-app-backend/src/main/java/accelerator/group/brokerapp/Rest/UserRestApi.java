@@ -107,13 +107,9 @@ public class UserRestApi {
         if(userRepository.findByEmail(registrationRequest.getEmail()).isPresent()){
             return new ResponseEntity("User already exist", HttpStatus.FORBIDDEN);
         }else{
-            User user = new User();
-            user.setUsername(registrationRequest.getUsername());
-            user.setPassword(passwordEncoder().encode(registrationRequest.getPassword()));
-            user.setAge(null);
-            user.setEmail(registrationRequest.getEmail());
-            user.setRole(Role.USER);
-            user.setStatus(Status.ACTIVE);
+            User user = new User(registrationRequest.getUsername(), registrationRequest.getPassword(),
+                    null, registrationRequest.getEmail(),
+                    Role.USER, Status.ACTIVE);
             userService.saveUser(user);
             User user1 = userRepository.findByUsername(registrationRequest.getUsername()).get();
             AccessToken = jwtTokenProvider.createAccessToken(user1.getUsername(), user1.getRole().name());

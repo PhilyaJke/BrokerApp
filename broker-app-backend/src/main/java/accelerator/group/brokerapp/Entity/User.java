@@ -48,6 +48,15 @@ public class User {
     @JsonIgnore
     private Status status;
 
+    public User(String username, String password, String age, String email, Role role, Status status) {
+        this.username = username;
+        this.password = password;
+        this.age = age;
+        this.email = email;
+        this.role = role;
+        this.status = status;
+    }
+
     @PrePersist
     public void init(){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
