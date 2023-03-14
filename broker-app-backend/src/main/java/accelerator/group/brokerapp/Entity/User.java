@@ -48,6 +48,10 @@ public class User {
     @JsonIgnore
     private Status status;
 
+    public User(){
+
+    }
+
     public User(String username, String password, String age, String email, Role role, Status status) {
         this.username = username;
         this.password = password;
