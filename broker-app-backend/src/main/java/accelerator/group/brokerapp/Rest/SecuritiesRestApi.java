@@ -1,17 +1,13 @@
 package accelerator.group.brokerapp.Rest;
 
-import accelerator.group.brokerapp.Entity.Securities;
-import accelerator.group.brokerapp.Responses.SecuritiesResponses;
 import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
-import com.owlike.genson.Genson;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-
+@Slf4j
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
 public class SecuritiesRestApi {
@@ -25,6 +21,7 @@ public class SecuritiesRestApi {
 
     @GetMapping("/api/securities/list/allforeignsecurities")
     public ResponseEntity findAllForeignSecurities(){
+        log.info("Пришел запрос на все иностранные акции");
         if(!securitiesService.findAllForeignSecurities().isEmpty()) {
             return ResponseEntity.ok(securitiesService.findAllForeignSecurities());
         }else{
@@ -35,6 +32,7 @@ public class SecuritiesRestApi {
     @GetMapping("/api/securities/list/allrusecurities")
     public ResponseEntity findAllRuSecurities(){
         if(!securitiesService.findAllRuSecurities().isEmpty()) {
+            log.info("Пришел запрос на все российские акции");
             return ResponseEntity.ok(securitiesService.findAllRuSecurities());
         }else{
             return new ResponseEntity("Ru securities not found", HttpStatus.NOT_FOUND);
@@ -43,6 +41,7 @@ public class SecuritiesRestApi {
 
     @GetMapping("/api/securities/list/allsecurities")
     public ResponseEntity findAllSecurities(){
+        log.info("Пришел запрос на все акции");
         if(!securitiesService.findAllSecurities().isEmpty()) {
             return ResponseEntity.ok(securitiesService.findAllSecurities());
         }else{

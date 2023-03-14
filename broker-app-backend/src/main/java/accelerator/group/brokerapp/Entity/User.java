@@ -38,15 +38,28 @@ public class User {
     @Column(name = "email", columnDefinition = "VARCHAR(255)", unique = true)
     private String email;
 
-    @Enumerated
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "role", columnDefinition = "VARCHAR(255)")
     @JsonIgnore
     private Role role;
 
-    @Enumerated
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "status", columnDefinition = "VARCHAR(255)")
     @JsonIgnore
     private Status status;
+
+    public User(){
+
+    }
+
+    public User(String username, String password, String age, String email, Role role, Status status) {
+        this.username = username;
+        this.password = password;
+        this.age = age;
+        this.email = email;
+        this.role = role;
+        this.status = status;
+    }
 
     @PrePersist
     public void init(){

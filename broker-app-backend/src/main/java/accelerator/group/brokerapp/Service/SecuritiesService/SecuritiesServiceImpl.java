@@ -2,12 +2,10 @@ package accelerator.group.brokerapp.Service.SecuritiesService;
 
 import accelerator.group.brokerapp.Entity.Securities;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
-import accelerator.group.brokerapp.Responses.SecuritiesResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class SecuritiesServiceImpl implements SecuritiesService{
