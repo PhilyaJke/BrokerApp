@@ -4104,7 +4104,7 @@ packages:
 
   /eslint-loader/2.2.1_qqlnan5pqjkjsi4t2sq43gyvy4:
     resolution: {integrity: sha512-RLgV9hoCVsMLvOxCuNjdqOrUqIj9oJg8hF44vzJaYqsAHuY9G2YAeN3joQ9nxP0p5Th9iFSIpKo+SD8KISxXRg==}
-    deprecated: This loader has been deprecated. Please use eslint-webpack-plugin
+    deprecated: This appLoader has been deprecated. Please use eslint-webpack-plugin
     peerDependencies:
       eslint: '>=1.6.0 <7.0.0'
       webpack: '>=2.0.0 <5.0.0'

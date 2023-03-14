@@ -3,7 +3,7 @@ import {Button, Card, Form, Input, message} from 'antd';
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {useAuth} from "../../providers/authProvider";
-import {Navigate, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 
 const validationSchema = Yup.object().shape({
@@ -20,9 +20,6 @@ const AuthPage = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const {isAuth, login} = useAuth();
-    if (isAuth()) {
-        return <Navigate to={'/profile'}/>;
-    }
 
     const formik = useFormik({
         initialValues: {
