@@ -38,12 +38,12 @@ public class User {
     @Column(name = "email", columnDefinition = "VARCHAR(255)", unique = true)
     private String email;
 
-    @Enumerated
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "role", columnDefinition = "VARCHAR(255)")
     @JsonIgnore
     private Role role;
 
-    @Enumerated
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "status", columnDefinition = "VARCHAR(255)")
     @JsonIgnore
     private Status status;

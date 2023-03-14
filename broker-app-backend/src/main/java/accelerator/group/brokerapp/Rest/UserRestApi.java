@@ -12,6 +12,7 @@ import accelerator.group.brokerapp.Security.JwtTokenProvider;
 import accelerator.group.brokerapp.Service.UserService.UserServiceImpl;
 import accelerator.group.brokerapp.TinkoffInvestApi.run;
 import com.owlike.genson.Genson;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,7 @@ import java.util.Map;
 // Поправить названия (auth -> login)
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
+@Slf4j
 public class UserRestApi {
 
     private PasswordEncoder passwordEncoder(){
@@ -63,6 +65,7 @@ public class UserRestApi {
     @Transactional
     @PostMapping("/api/auth/login")
     public ResponseEntity login(@RequestBody AuthenticationRequest authenticationRequest){
+        log.info("Запрос на логин пришел от пользователя - {}", authenticationRequest.getEmail());
         User user = userRepository.findByEmail(authenticationRequest.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User doesnt exist"));
 
@@ -87,8 +90,10 @@ public class UserRestApi {
             response.put("username", user.getUsername());
             response.put("accessToken", AccessToken);
             response.put("refreshToken", RefreshToken);
+            log.info("Логин прошел успешно, пользователь - {}", authenticationRequest.getEmail());
             return ResponseEntity.ok(response);
         }catch (AuthenticationException exc){
+            log.error("Ошибка логина - невервый пароль/мыло - {}", authenticationRequest.getEmail());
             exc.getCause();
             return new ResponseEntity<>("Invalid email/password combination", HttpStatus.UNAUTHORIZED);
         }
@@ -96,6 +101,7 @@ public class UserRestApi {
 
     @PostMapping("/api/auth/registration")
     public ResponseEntity registration(@RequestBody RegistrationRequest registrationRequest){
+        log.info("Запрос на регистрацию пришел от пользователя - {}", registrationRequest.getEmail());
         String AccessToken = "";
         String RefreshToken = "";
         if(userRepository.findByEmail(registrationRequest.getEmail()).isPresent()){
@@ -120,12 +126,14 @@ public class UserRestApi {
             response.put("username", user.getUsername());
             response.put("accessToken", AccessToken);
             response.put("refreshToken", RefreshToken);
+            log.info("Регистрация прошла успешно, пользователь - {}", registrationRequest.getEmail());
             return new ResponseEntity(response, HttpStatus.CREATED);
         }
     }
 
     @GetMapping("/api/auth/updateaccesstoken")
     public ResponseEntity updateAccessToken(@RequestHeader(value = "Authorization") String Authorization){
+        log.info("Запрос на обновление access токена");
         User user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization)).get();
         String AccessToken = jwtTokenProvider.createAccessToken(user.getUsername(), user.getRole().name());
         Map<String, Object> response = new HashMap<>();
@@ -136,6 +144,7 @@ public class UserRestApi {
     @Transactional
     @GetMapping("/api/auth/logout")
     public void logout(@RequestHeader(value = "Authorization") String Authorization, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        log.info("Запрос на выход из приложения ");
         refreshTokensRepository.deleteRefreshTokensByToken(Authorization);
         SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
         securityContextLogoutHandler.logout(httpServletRequest, httpServletResponse, null);
