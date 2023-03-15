@@ -1,8 +1,8 @@
-import {StocksCardProps} from './useStocks.model';
+import {StocksCardProps, StocksPageProps} from './useStocks.model';
 
 const API_URL = 'http://localhost:8080';
 
-    export const getAllStocks = async (): Promise<StocksCardProps[]> => {
+    export const getAllStocks = async (): Promise<StocksPageProps> => {
         const response = await fetch(`${API_URL}/api/securities/list/allsecurities`, {
             method: 'GET',
             headers: {
@@ -17,7 +17,7 @@ const API_URL = 'http://localhost:8080';
         return response.json();
     };
 
-    export const getRuStocks = async (): Promise<StocksCardProps[]> => {
+    export const getRuStocks = async (): Promise<StocksPageProps> => {
         const response = await fetch(`${API_URL}/api/securities/list/allrusecurities`, {
             method: 'GET',
             headers: {
@@ -33,7 +33,7 @@ const API_URL = 'http://localhost:8080';
     }
 
 
-    export const getForeignStocks = async (): Promise<StocksCardProps[]> => {
+    export const getForeignStocks = async (): Promise<StocksPageProps> => {
         const response = await fetch(`${API_URL}/api/securities/list/allforeignsecurities`, {
             method: 'GET',
             headers: {

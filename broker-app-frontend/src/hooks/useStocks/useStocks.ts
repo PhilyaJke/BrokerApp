@@ -1,18 +1,24 @@
 import { useState } from "react";
 import { getAllStocks, getForeignStocks, getRuStocks } from "./api";
-import { StocksCardProps } from "./useStocks.model";
+import { StocksCardProps, StocksPageProps } from "./useStocks.model";
 
 const useStocks = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isDown, setIsDown] = useState<boolean>(false);
+    const [page, setPage] = useState<number>(0);
+    const [size, setSize] = useState<number>(10);
+    const [totalPages, setTotalPages] = useState<number>(0);
+
+
 
     const handleRuStocks = async (): Promise<StocksCardProps[]> => {
         setIsLoading(true);
         try {
-            const stocks = await getRuStocks();
+            const stocksPage: StocksPageProps = await getRuStocks();
             setIsLoading(false);
-            setIsDown(false)
-            return stocks;
+            setIsDown(false);
+            return stocksPage.securitiesList;
+            console.log(stocksPage.securitiesList)
         } catch (e) {
             setIsLoading(false);
             setIsDown(true);
@@ -23,10 +29,11 @@ const useStocks = () => {
     const handleForeignStocks = async (): Promise<StocksCardProps[]> => {
         setIsLoading(true);
         try {
-            const stocks = await getForeignStocks();
+            const stocksPage: StocksPageProps = await getForeignStocks();
             setIsLoading(false);
             setIsDown(false);
-            return stocks;
+            return stocksPage.securitiesList;
+            console.log(stocksPage.securitiesList)
         } catch (e) {
             setIsLoading(false);
             setIsDown(true);
@@ -37,10 +44,11 @@ const useStocks = () => {
     const handleAllStocks = async (): Promise<StocksCardProps[]> => {
         setIsLoading(true);
         try {
-            const stocks = await getAllStocks();
+            const stocksPage: StocksPageProps = await getAllStocks();
             setIsLoading(false);
             setIsDown(false)
-            return stocks;
+            return stocksPage.securitiesList;
+            console.log(stocksPage.securitiesList)
         } catch (e) {
             setIsLoading(false);
             setIsDown(true);

@@ -4,3 +4,11 @@ export interface StocksCardProps {
     sector: string;
     ticker: string;
 }
+
+
+
+export interface StocksPageProps {
+    "securitiesList": StocksCardProps[];
+    "currentPage": number;
+    "totalPages": number;
+}
