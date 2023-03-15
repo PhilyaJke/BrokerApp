@@ -1,16 +1,19 @@
 package accelerator.group.brokerapp.Service.SecuritiesService;
 
 import accelerator.group.brokerapp.Entity.Securities;
+import accelerator.group.brokerapp.Responses.SecuritiesPageResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface SecuritiesService {
 
-    List<Securities> findAllSecurities();
+    SecuritiesPageResponse findAllSecuritiesPage(Pageable pageable);
 
-    List<Securities> findAllForeignSecurities();
+    SecuritiesPageResponse findAllForeignSecuritiesPage(Pageable pageable);
 
-    List<Securities> findAllRuSecurities();
+    SecuritiesPageResponse findAllRuSecuritiesPage(Pageable pageable);
 
     List<Securities> findForeignSecurities(String county);
 
