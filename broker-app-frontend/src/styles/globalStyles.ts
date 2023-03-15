@@ -2,11 +2,8 @@ import {createGlobalStyle} from 'styled-components';
 import {darkTheme} from './themes/dark.theme';
 
 export const GlobalStyle = createGlobalStyle`
-  :root {
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  button, input, li, image {
+    all: unset;
   }
 
   * {
@@ -15,21 +12,30 @@ export const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 
-  button, input, li, image {
-    all: unset;
+
+  :root {
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
+
   body {
-    padding: 4px;
-    max-width: 1440px;
-    margin: 0 auto;
     min-height: 100vh;
     display: flex;
     background: ${darkTheme.colors.primary};
     color: ${darkTheme.colors.primaryText};
     font-family: 'Rubik', sans-serif;
+  }
 
-    @media (min-width: 768px) {
-    }
+  main {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 6px;
+    min-height: 100vh;
+    scroll-behavior: smooth;
+    display: block;
   }
 `;

@@ -3,12 +3,7 @@ import {Navigate} from "react-router-dom";
 import {message} from "antd";
 
 export const ProfilePage = () => {
-    const {isAuth, logout} = useAuth();
-
-    if (!isAuth()) {
-        message.info("Вы не авторизованы");
-        return <Navigate to={"/"}/>;
-    }
+    const {logout} = useAuth();
 
     const handleLogout = async () => {
         await logout();

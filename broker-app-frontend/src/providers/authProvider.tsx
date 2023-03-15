@@ -43,8 +43,9 @@ interface Context {
     register: (props: RegisterReq) => Promise<contextRes>,
     logout: () => void,
     getAccessToken: () => string | null,
-    isAuth: () => boolean,
+    isAuth: boolean,
     isReady: boolean,
+    isDown: boolean,
 }
 
 
@@ -53,8 +54,9 @@ const AuthContext = createContext<Context>({
     register: () => Promise.resolve({status: 'error', message: 'something went wrong'}),
     logout: () => Promise.resolve({status: 'error', message: 'something went wrong'}),
     getAccessToken: () => null,
-    isAuth: () => false,
+    isAuth: false,
     isReady: false,
+    isDown: false,
 });
 
 
@@ -62,27 +64,27 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [refreshToken, setRefreshToken] = useState<string | null>(localStorage.getItem(config.refreshTokenLocalStorageKey) || null);
     const [isReady, setIsReady] = useState<boolean>(false);
+    const [isDown, setIsDown] = useState<boolean>(false);
+
+
+    // Controllers
+
+
     //on start get refresh token from localstorage
     useEffect(() => {
         const accessTokenFromLS = localStorage.getItem(config.refreshTokenLocalStorageKey);
         if (accessTokenFromLS) {
             refreshAccessToken(accessTokenFromLS)
-                .then((accessTokenStatus: string) => {
-                    if (accessTokenStatus === 'ok') {
-                        setRefreshToken(accessTokenFromLS);
-                    } else {
-                        setRefreshToken(null);
+                .then((res) => {
+                    if (res === 401) {
+                        logout();
                     }
-                })
-                .catch(() => {
-                    setRefreshToken(null);
                 })
                 .finally(() => {
                         setIsReady(true);
                     }
                 );
-        }
-        else {
+        } else {
             setIsReady(true);
         }
 
@@ -94,7 +96,7 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     }, [refreshToken]);
 
 
-    const refreshAccessToken = async (refreshToken: string): Promise<string> => {
+    const refreshAccessToken = async (refreshToken: string): Promise<number> => {
         try {
             const response = await fetch(`${config.authUrl}/api/auth/updateaccesstoken`, {
                 method: 'GET',
@@ -104,16 +106,15 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
                 }
             });
             if (!response.ok) {
-                return ('error');
+                return response.status;
             }
             const data: refreshAccessTokenRes = await response.json();
-            if (!data || !data.accessToken) {
-                return ('error');
-            }
             setAccessToken(data.accessToken);
-            return 'ok';
-        } catch (error) {
-            return ('error');
+            return response.status;
+        } catch (e) {
+            console.log(e);
+            setIsDown(true);
+            return 500;
         }
     };
 
@@ -150,6 +151,7 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
             });
 
             if (response.status === 500) {
+                setIsDown(true);
                 return {status: 'error', message: 'Сервис временно недоступен'};
             }
 
@@ -164,7 +166,7 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
             return {status: 'ok', message: 'ok'};
         } catch (error) {
             console.error(`Failed to login: ${error}`);
-
+            setIsDown(true)
             return {status: 'error', message: 'Сервис временно недоступен'};
         }
     }
@@ -174,13 +176,17 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         setAccessToken(null);
         setRefreshToken(null);
         localStorage.removeItem(config.refreshTokenLocalStorageKey);
-        await fetch(config.authUrl + "/api/auth/logout", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${refreshToken}`,
-                "Content-Type": "application/json"
-            },
-        })
+        try {
+            await fetch(config.authUrl + "/api/auth/logout", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${refreshToken}`,
+                    "Content-Type": "application/json"
+                },
+            })
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     const register = async (props: registerReq): Promise<contextRes> => {
@@ -193,9 +199,6 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
                 body: JSON.stringify(props),
             });
 
-            if (response.status === 500) {
-                return {status: 'error', message: 'Сервис временно недоступен'};
-            }
             const data: AuthRes = await response.json();
 
             if (!data.refreshToken) {
@@ -207,13 +210,13 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
             return {status: 'ok', message: 'ok'};
         } catch (error) {
             console.error(`Failed to reg: ${error}`);
-
+            setIsDown(true);
             return {status: 'error', message: 'Сервис временно недоступен'};
         }
     };
 
 
-    const getAccessToken = () => {
+    const getAccessToken = (): string | null => {
         return accessToken;
     }
 
@@ -225,13 +228,23 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         return Date.now() < expirationTime;
     }
 
+    const getIsReady = () => {
+        return isReady;
+    }
+
+    const getIsDown = () => {
+        return isDown;
+    }
+
+
     const value: Context = {
         login,
         register,
         logout,
         getAccessToken,
-        isAuth,
-        isReady,
+        isAuth: isAuth(),
+        isDown: getIsDown(),
+        isReady: getIsReady(),
     };
     return (
         <AuthContext.Provider value={value}>
