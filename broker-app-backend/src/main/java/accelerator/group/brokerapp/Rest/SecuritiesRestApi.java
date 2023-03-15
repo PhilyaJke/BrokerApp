@@ -3,6 +3,10 @@ package accelerator.group.brokerapp.Rest;
 import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,33 +24,39 @@ public class SecuritiesRestApi {
     }
 
     @GetMapping("/api/securities/list/allforeignsecurities")
-    public ResponseEntity findAllForeignSecurities(){
+    public ResponseEntity findAllForeignSecurities(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size){
         log.info("Пришел запрос на все иностранные акции");
-        if(!securitiesService.findAllForeignSecurities().isEmpty()) {
-            return ResponseEntity.ok(securitiesService.findAllForeignSecurities());
-        }else{
-            return new ResponseEntity("Foreigns securities not found", HttpStatus.NOT_FOUND);
-        }
+//        if(!securitiesService.findAllForeignSecuritiesPage(pageable).) {
+            return ResponseEntity.ok(securitiesService.findAllForeignSecuritiesPage(PageRequest.of(page, size)));
+//        }else{
+//            return new ResponseEntity("Foreigns securities not found", HttpStatus.NOT_FOUND);
+//        }
     }
 
     @GetMapping("/api/securities/list/allrusecurities")
-    public ResponseEntity findAllRuSecurities(){
-        if(!securitiesService.findAllRuSecurities().isEmpty()) {
+    public ResponseEntity findAllRuSecurities(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size){
+//        if(!securitiesService.findAllRuSecuritiesPage(pageable).isEmpty()) {
             log.info("Пришел запрос на все российские акции");
-            return ResponseEntity.ok(securitiesService.findAllRuSecurities());
-        }else{
-            return new ResponseEntity("Ru securities not found", HttpStatus.NOT_FOUND);
-        }
+            return ResponseEntity.ok(securitiesService.findAllRuSecuritiesPage(PageRequest.of(page, size)));
+//        }else{
+//            return new ResponseEntity("Ru securities not found", HttpStatus.NOT_FOUND);
+//        }
     }
 
     @GetMapping("/api/securities/list/allsecurities")
-    public ResponseEntity findAllSecurities(){
+    public ResponseEntity findAllSecurities(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size){
         log.info("Пришел запрос на все акции");
-        if(!securitiesService.findAllSecurities().isEmpty()) {
-            return ResponseEntity.ok(securitiesService.findAllSecurities());
-        }else{
-            return new ResponseEntity("All securities not found", HttpStatus.NOT_FOUND);
-        }
+//        if(!securitiesService.findAllSecuritiesPage(pageable).isEmpty()) {
+            return ResponseEntity.ok(securitiesService.findAllSecuritiesPage(PageRequest.of(page, size)));
+//        }else{
+//            return new ResponseEntity("All securities not found", HttpStatus.NOT_FOUND);
+//        }
     }
 
     @GetMapping("/api/securities/list/specificforeignsecurities")
