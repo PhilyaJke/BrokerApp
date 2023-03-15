@@ -1,6 +1,6 @@
 import {List, message} from 'antd';
 import {Link} from 'react-router-dom';
-import {useAuth} from "../../providers/authProvider";
+import {useAuth} from "../../providers/authProvider/authProvider";
 import {useCallback, useMemo} from "react";
 
 export const MainPage = () => {

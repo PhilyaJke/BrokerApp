@@ -23,6 +23,7 @@ export const GlobalStyle = createGlobalStyle`
 
   body {
     min-height: 100vh;
+    width: 100vw;
     display: flex;
     background: ${darkTheme.colors.primary};
     color: ${darkTheme.colors.primaryText};
@@ -37,5 +38,12 @@ export const GlobalStyle = createGlobalStyle`
     min-height: 100vh;
     scroll-behavior: smooth;
     display: block;
+  }
+  
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+      monospace
+    ;
+    font-size: 14px;
   }
 `;

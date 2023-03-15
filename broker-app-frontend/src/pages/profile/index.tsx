@@ -1,4 +1,4 @@
-import {useAuth} from "../../providers/authProvider";
+import {useAuth} from "../../providers/authProvider/authProvider";
 import {Navigate} from "react-router-dom";
 import {message} from "antd";
 

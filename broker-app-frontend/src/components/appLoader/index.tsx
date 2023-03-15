@@ -10,7 +10,7 @@ const AppLoader = () => {
         const intervalId = setInterval(() => {
             timer.current += 300;
             if (loaderText.current) {
-                if (timer.current > 0) {
+                if (timer.current >= 300) {
                     loaderText.current.innerText = "Узнаем цены на биржах...";
                 }
                 if (timer.current > 1400) {
@@ -27,8 +27,8 @@ const AppLoader = () => {
 
     return (
         <LoaderWrapper>
-            <LoaderImage src={load} alt="загрузка..."/>
-            <p ref={loaderText}></p>
+            <LoaderImage src={load} alt="..."/>
+            <p ref={loaderText}/>
         </LoaderWrapper>
     );
 };

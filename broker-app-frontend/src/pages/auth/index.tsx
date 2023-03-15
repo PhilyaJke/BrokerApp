@@ -2,7 +2,7 @@ import styled from "styled-components";
 import {Button, Card, Form, Input, message} from 'antd';
 import {useFormik} from "formik";
 import * as Yup from "yup";
-import {useAuth} from "../../providers/authProvider";
+import {useAuth} from "../../providers/authProvider/authProvider";
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 

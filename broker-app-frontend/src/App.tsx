@@ -2,34 +2,40 @@ import AuthPage from "./pages/auth";
 import {Navigate, Route, Routes} from "react-router-dom";
 import RegisterPage from "./pages/register";
 import {MainPage} from "./pages/main/index.";
-import {useAuth} from "./providers/authProvider";
+import {useAuth, useIsAuthenticated} from "./providers/authProvider/authProvider";
 import SecureApp from "./components/secureApp";
 import styled from "styled-components";
 import AppLoader from "./components/appLoader";
+import serviceIsUnavailablePage from "./pages/serviceIsUnavailable";
+import ServiceIsUnavailablePage from "./pages/serviceIsUnavailable";
 
 const App = () => {
-    const {isReady, isAuth, isDown} = useAuth();
+    // const {isReady, isDown} = useAuth();
+    const {isDown, isLoading} = useAuth();
+    const isAuth = useIsAuthenticated();
+    if (isDown) {
+        return <main>
+            <ServiceIsUnavailablePage/>
+        </main>
+    }
 
-    // if (isDown) {
-    //     return <h2>Походу сервак упал☠️☠️☠️</h2>
-    // }
-    if (!isReady) {
+    if (isLoading) {
         setTimeout(() => {
-            if (isReady) {
+            console.log('isLoading', isLoading)
+            if (isLoading) {
+                console.log('isLoading true')
                 return <App/>
             }
         }, 300);
+        console.log('isLoading end', isLoading)
         return <AppLoader/>
     }
     if (isAuth) {
         return (
-            <AppWrapper>
                 <SecureApp/>
-            </AppWrapper>
         )
     }
     return (
-        <AppWrapper>
             <Routes>
                 <Route path={"/"} element={<MainPage/>}/>
                 <Route path={"/auth"} element={<AuthPage/>}/>
@@ -37,18 +43,9 @@ const App = () => {
                 <Route path={"*"} element={<Navigate to={"/"}/>}/>
                 {/*<Route path={"*"} element={<h2>404.<br/>Page not exist :-(</h2>}/>*/}
             </Routes>
-        </AppWrapper>
     )
 }
 
 export default App
 
 
-const AppWrapper = styled.div`
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 auto;
-`

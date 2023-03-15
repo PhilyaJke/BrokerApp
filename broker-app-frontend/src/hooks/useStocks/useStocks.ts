@@ -1,90 +1,60 @@
-import {StocksCardProps} from './useStocks.model';
-
+import { useState } from "react";
+import { getAllStocks, getForeignStocks, getRuStocks } from "./api";
+import { StocksCardProps } from "./useStocks.model";
 
 const useStocks = () => {
-    const getRuStocks = (): StocksCardProps[] => {
-        //TODO: implement
-        return [
-            {
-                name: 'Автоваз',
-                region: 'RU',
-                sector: 'Автомобильный',
-                ticker: 'AVAZ'
-            } as StocksCardProps,
-            {
-                name: 'Газпром',
-                region: 'RU',
-                sector: 'Энергетика',
-                ticker: 'GAZP'
-            } as StocksCardProps,
-            {
-                name: 'Магнит',
-                region: 'RU',
-                sector: 'Торговля',
-                ticker: 'MGNT'
-            } as StocksCardProps,
-            {
-                name: 'М.видео',
-                region: 'RU',
-                sector: 'Торговля',
-                ticker: 'MVID'
-            } as StocksCardProps,
-            {
-                name: 'МТС',
-                region: 'RU',
-                sector: 'Телекоммуникации',
-                ticker: 'MTSS'
-            } as StocksCardProps,
-            {
-                name: 'Норникель',
-                region: 'RU',
-                sector: 'Металлургия',
-                ticker: 'GMKN'
-            } as StocksCardProps,
-            {
-                name: 'Роснефть',
-                region: 'RU',
-                sector: 'Энергетика',
-                ticker: 'ROSN'
-            } as StocksCardProps,
-            {
-                name: 'Сбербанк',
-                region: 'RU',
-                sector: 'Банки',
-                ticker: 'SBER'
-            } as StocksCardProps,
-            {
-                name: 'Сургутнефтегаз',
-                region: 'RU',
-                sector: 'Энергетика',
-                ticker: 'SNGS'
-            } as StocksCardProps,
-            {
-                name: 'Татнефть',
-                region: 'RU',
-                sector: 'Энергетика',
-                ticker: 'TATN'
-            } as StocksCardProps,
-        ];
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isDown, setIsDown] = useState<boolean>(false);
 
-    }
+    const handleRuStocks = async (): Promise<StocksCardProps[]> => {
+        setIsLoading(true);
+        try {
+            const stocks = await getRuStocks();
+            setIsLoading(false);
+            setIsDown(false)
+            return stocks;
+        } catch (e) {
+            setIsLoading(false);
+            setIsDown(true);
+            return [];
+        }
+    };
 
-    const getForeignStocks = (): StocksCardProps[] => {
-        //TODO: implement
-        return []
-    }
+    const handleForeignStocks = async (): Promise<StocksCardProps[]> => {
+        setIsLoading(true);
+        try {
+            const stocks = await getForeignStocks();
+            setIsLoading(false);
+            setIsDown(false);
+            return stocks;
+        } catch (e) {
+            setIsLoading(false);
+            setIsDown(true);
+            return [];
+        }
+    };
 
-    const getAllStocks = (): StocksCardProps[] => {
-        //TODO: implement
-        return []
-    }
+    const handleAllStocks = async (): Promise<StocksCardProps[]> => {
+        setIsLoading(true);
+        try {
+            const stocks = await getAllStocks();
+            setIsLoading(false);
+            setIsDown(false)
+            return stocks;
+        } catch (e) {
+            setIsLoading(false);
+            setIsDown(true);
+            return [];
+        }
+    };
 
     return {
-        getRuStocks,
-        getForeignStocks,
-        getAllStocks
-    }
-}
-
+        isLoading,
+        isDown,
+        handleRuStocks,
+        handleForeignStocks,
+        handleAllStocks,
+    };
+};
 
 export default useStocks;
