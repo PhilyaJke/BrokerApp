@@ -15,6 +15,7 @@ const useStocks = () => {
         setIsLoading(true);
         try {
             const stocksPage: StocksPageProps = await getStocks(props);
+            console.log('handleStocks stocksPage', props.region);
             setIsLoading(false);
             setIsDown(false)
             setTotalPages(stocksPage.totalPages);
