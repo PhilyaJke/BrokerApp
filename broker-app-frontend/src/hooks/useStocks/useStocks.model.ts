@@ -6,6 +6,13 @@ export interface StocksCardProps {
 }
 
 
+export interface StocksPageRequest {
+    page?: number;
+    size?: number;
+    region?: 'ru' | 'foreign' | 'all';
+}
+
+
 
 export interface StocksPageProps {
     "securitiesList": StocksCardProps[];

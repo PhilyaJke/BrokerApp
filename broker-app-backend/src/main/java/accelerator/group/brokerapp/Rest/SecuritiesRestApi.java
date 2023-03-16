@@ -28,12 +28,14 @@ public class SecuritiesRestApi {
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
             @RequestParam(required = false, defaultValue = "RU") String region){
-        log.info("Пришел запрос на все иностранные акции");
         if(region.equals("all")) {
+            log.info("Пришел запрос на все акции");
             return ResponseEntity.ok(securitiesService.findAllSecuritiesPage(PageRequest.of(page, size)));
         }else if(region.equals("foreign")){
+            log.info("Пришел запрос на все иностранные акции");
             return ResponseEntity.ok(securitiesService.findAllForeignSecuritiesPage(PageRequest.of(page, size)));
         }else{
+            log.info("Пришел запрос на все российские акции");
             return ResponseEntity.ok(securitiesService.findAllRuSecuritiesPage(PageRequest.of(page, size)));
         }
     }
