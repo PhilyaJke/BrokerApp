@@ -2,7 +2,6 @@ import {AuthRes, LoginReq, RefreshAccessTokenRes, RegisterReq} from "./models";
 
 const authUrl = 'http://localhost:8080';
 export async function login(req: LoginReq): Promise<AuthRes> {
-    console.log('login called');
     const response = await fetch(`${authUrl}/api/auth/login`, {
         method: 'POST',
         headers: {

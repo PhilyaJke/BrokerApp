@@ -1,24 +1,31 @@
-import {StocksCardProps, StocksPageProps} from './useStocks.model';
+import {StocksCardProps, StocksPageProps, StocksPageRequest} from './useStocks.model';
 
 const API_URL = 'http://localhost:8080';
 
-    export const getAllStocks = async (): Promise<StocksPageProps> => {
-        const response = await fetch(`${API_URL}/api/securities/list/allsecurities`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
 
-        if (!response.ok) {
-            throw new Error('Failed to get all stocks');
+    export const getStocks = async (props: StocksPageRequest): Promise<StocksPageProps> => {
+        const {size, page, region} = props;
+        let additionalParams = '';
+        if (size) {
+            if (additionalParams) {
+                additionalParams += '&';
+            }
+            additionalParams += `size=${size}`;
+        }
+        if (page) {
+            if (additionalParams) {
+                additionalParams += '&';
+            }
+            additionalParams += `page=${page}`;
+        }
+        if (region && region !== 'ru') {
+            if (additionalParams) {
+                additionalParams += '&';
+            }
+            additionalParams += `filter=${region}`;
         }
 
-        return response.json();
-    };
-
-    export const getRuStocks = async (): Promise<StocksPageProps> => {
-        const response = await fetch(`${API_URL}/api/securities/list/allrusecurities`, {
+        const response = await fetch(`${API_URL}/api/securities/list/allforeignsecurities?` + additionalParams, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -33,19 +40,5 @@ const API_URL = 'http://localhost:8080';
     }
 
 
-    export const getForeignStocks = async (): Promise<StocksPageProps> => {
-        const response = await fetch(`${API_URL}/api/securities/list/allforeignsecurities`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to get foreign stocks');
-        }
-
-        return response.json();
-    }
 
     
