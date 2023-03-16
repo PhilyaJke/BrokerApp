@@ -16,19 +16,15 @@ public interface SecuritiesRepository extends JpaRepository<Securities, Long> {
     @Query("SELECT s.Figi FROM Securities s")
     List<String> findAllFigiSecurities();
 
-    @Query("SELECT s FROM Securities s WHERE s.region <> 'RU'")
-    Page<Securities> findAllForeignSecuritiesPage(org.springframework.data.domain.Pageable pageable);
-
     @Query("SELECT s FROM Securities s WHERE s.region = 'RU'")
     Page<Securities> findAllRuSecuritiesPage(Pageable pageable);
 
-    @Query("SELECT s FROM Securities s")
-    Page<Securities> findAllSecurities(org.springframework.data.domain.Pageable pageable);
+    @Query("SELECT s FROM Securities s WHERE s.region <> 'RU'")
+    Page<Securities> findAllForeignSecuritiesPage(Pageable pageable);
 
-    @Query(value = "SELECT s FROM Securities s WHERE s.region = ?1")
-    List<Securities> findForeignSecurities(@Param(value = "country") String country);
+    @Query("SELECT s FROM Securities s ")
+    Page<Securities> findAllSecuritiesPage(Pageable pageable);
 
-    @Query(value = "SELECT s FROM Securities s WHERE s.sector = ?1")
-    List<Securities> findSecuritiesBySector(@Param(value = "sector") String sector);
+
 
 }

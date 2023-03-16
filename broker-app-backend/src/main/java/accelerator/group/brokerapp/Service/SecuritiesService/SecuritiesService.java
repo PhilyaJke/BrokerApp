@@ -11,13 +11,8 @@ public interface SecuritiesService {
 
     SecuritiesPageResponse findAllSecuritiesPage(Pageable pageable);
 
-    SecuritiesPageResponse findAllForeignSecuritiesPage(Pageable pageable);
-
     SecuritiesPageResponse findAllRuSecuritiesPage(Pageable pageable);
 
-    List<Securities> findForeignSecurities(String county);
-
-    List<Securities> findSecuritiesBySector(String sector);
-
+    SecuritiesPageResponse findAllForeignSecuritiesPage(Pageable pageable);
 
 }

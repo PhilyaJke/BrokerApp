@@ -133,7 +133,7 @@ public class UserRestApi {
         User user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization)).get();
         String AccessToken = jwtTokenProvider.createAccessToken(user.getUsername(), user.getRole().name());
         Map<String, Object> response = new HashMap<>();
-        response.put("AccessToken", AccessToken);
+        response.put("accessToken", AccessToken);
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 

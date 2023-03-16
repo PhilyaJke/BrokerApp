@@ -41,7 +41,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<RefreshA
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${refreshToken}`
+            'Authorization': `${refreshToken}`
         }
     });
 

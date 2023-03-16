@@ -8,8 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class SecuritiesServiceImpl implements SecuritiesService{
 
@@ -22,17 +20,7 @@ public class SecuritiesServiceImpl implements SecuritiesService{
 
     @Override
     public SecuritiesPageResponse findAllSecuritiesPage(Pageable pageable) {
-        Page<Securities> securitiesPage = securitiesRepository.findAllSecurities(pageable);
-        return new SecuritiesPageResponse(
-                securitiesPage.getContent(),
-                securitiesPage.getNumber(),
-                securitiesPage.getTotalPages()
-        );
-    }
-
-    @Override
-    public SecuritiesPageResponse findAllForeignSecuritiesPage(Pageable pageable) {
-        Page<Securities> securitiesPage = securitiesRepository.findAllForeignSecuritiesPage(pageable);
+        Page<Securities> securitiesPage = securitiesRepository.findAllSecuritiesPage(pageable);
         return new SecuritiesPageResponse(
                 securitiesPage.getContent(),
                 securitiesPage.getNumber(),
@@ -51,13 +39,14 @@ public class SecuritiesServiceImpl implements SecuritiesService{
     }
 
     @Override
-    public List findForeignSecurities(String country) {
-        return securitiesRepository.findForeignSecurities(country);
+    public SecuritiesPageResponse findAllForeignSecuritiesPage(Pageable pageable) {
+        Page<Securities> securitiesPage = securitiesRepository.findAllForeignSecuritiesPage(pageable);
+        return new SecuritiesPageResponse(
+                securitiesPage.getContent(),
+                securitiesPage.getNumber(),
+                securitiesPage.getTotalPages()
+        );
     }
 
-    @Override
-    public List<Securities> findSecuritiesBySector(String sector) {
-        return securitiesRepository.findSecuritiesBySector(sector);
-    }
 
 }
