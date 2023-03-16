@@ -5,6 +5,7 @@ const API_URL = 'http://localhost:8080';
 
     export const getStocks = async (props: StocksPageRequest): Promise<StocksPageProps> => {
         const {size, page, region} = props;
+        console.log('getStocks region', region);
         let additionalParams = '';
         if (size) {
             if (additionalParams) {
@@ -22,10 +23,10 @@ const API_URL = 'http://localhost:8080';
             if (additionalParams) {
                 additionalParams += '&';
             }
-            additionalParams += `filter=${region}`;
+            additionalParams += `region=${region}`;
         }
 
-        const response = await fetch(`${API_URL}/api/securities/list/allforeignsecurities?` + additionalParams, {
+        const response = await fetch(`${API_URL}/api/securities/list/securities?` + additionalParams, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -30,13 +30,14 @@ const OverviewPage = () => {
 
 
     const handleChangeRegion = (e: 'ru' | 'foreign' | 'all') => {
+        console.log(e);
         setStocksRegion(e);
         setPage(0);
     }
 
 
     const getStocks = async () => {
-        const stocks = await handleStocks({page, size, stocksRegion} as StocksPageRequest);
+        const stocks = await handleStocks({page, size, region: stocksRegion} as StocksPageRequest);
         setMaxPage(maxPage);
         //if region change, clear stocksCard
         if (page === 0) {
