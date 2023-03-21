@@ -14,5 +14,4 @@ public interface SecuritiesService {
     SecuritiesPageResponse findAllRuSecuritiesPage(Pageable pageable);
 
     SecuritiesPageResponse findAllForeignSecuritiesPage(Pageable pageable);
-
 }

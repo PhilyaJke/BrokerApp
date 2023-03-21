@@ -24,7 +24,7 @@ public class Securities {
     private String Figi;
 
     @Column(name = "name")
-    private String name;
+    private String Name;
 
     @Column(name = "ticker")
     private String Ticker;
@@ -34,14 +34,17 @@ public class Securities {
 
     @Column(name = "lot")
     @JsonIgnore
-    private int lot;
+    private int Lot;
 
     @Column(name = "first_candle_day")
     @JsonIgnore
-    private String date;
+    private String Date;
 
     @Column(name = "sector")
-    private String sector;
+    private String Sector;
+
+    @Column(name = "last_price")
+    private Long Lastprice;
 
     public Securities() {
 

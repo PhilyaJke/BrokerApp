@@ -47,6 +47,4 @@ public class SecuritiesServiceImpl implements SecuritiesService{
                 securitiesPage.getTotalPages()
         );
     }
-
-
 }

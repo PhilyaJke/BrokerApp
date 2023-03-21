@@ -1,6 +1,6 @@
 package accelerator.group.brokerapp;
 
-import accelerator.group.brokerapp.TinkoffInvestApi.CheckNewSecurituesFromApi;
+//import accelerator.group.brokerapp.TinkoffInvestApi.CheckNewSecurituesFromApi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
