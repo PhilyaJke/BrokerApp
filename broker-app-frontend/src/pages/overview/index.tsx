@@ -117,10 +117,7 @@ const OverviewPage = () => {
         <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
             <h1>Overview</h1>
             <Search onSearch={() => {
-            }} enterButton placeholder={'Поиск по тикеру'}
-                    style={{width: '300px', alignSelf: 'flex-end'}}>
-                <In
-            </Search>
+            }} enterButton placeholder={'Поиск по тикеру'}/>
             <Radio.Group onChange={(e) => handleChangeRegion(e.target.value)} value={stocksRegion}>
                 <Radio.Button value="ru">Российские акции 🇷🇺</Radio.Button>
                 <Radio.Button value="foreign">Иностранные акции</Radio.Button>
