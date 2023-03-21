@@ -5,15 +5,17 @@ import {Card, Radio} from "antd";
 import Search from "antd/es/input/Search";
 import {getStocks} from "../../hooks/useStocks/api";
 import AppLoader from "../../components/appLoader";
+import {json} from "react-router-dom";
 
 //PRIVATE ROUTE
 
-const StocksCard = memo(({ticker, name, region, sector}: StocksCardProps) => {
+const StocksCard = memo(({ticker, name, region, sector, lastprice}: StocksCardProps) => {
     return (
         <Card title={ticker} style={{width: 300}}>
             <p>{name}</p>
             <p>{region}</p>
             <p>{sector}</p>
+            <p>{String(lastprice)}$</p>
         </Card>
     );
 });
@@ -27,7 +29,13 @@ const OverviewPage = () => {
     const [page, setPage] = useState(0);
     const [maxPage, setMaxPage] = useState(1);
     const loaderRef = useRef<HTMLDivElement>(null);
-
+    let price = 'test'
+    //random price each 10 seconds
+    setInterval(() => {
+    price = Math.floor(Math.random() * 1000).toString();
+            console.log('price', price)
+    }
+    , 10000);
 
     const handleChangeRegion = (e: 'ru' | 'foreign' | 'all') => {
         console.log(e);
@@ -69,7 +77,8 @@ const OverviewPage = () => {
                     <AppLoader key={index}/>
                 );
             }
-            return <StocksCard key={index} {...stock} />;
+            //TODO REMOVE TEST PRICE
+            return <StocksCard key={index} {...stock}/>;
         });
     }, [stocksCard, page, stocksRegion, loaderRef]);
 
@@ -108,7 +117,10 @@ const OverviewPage = () => {
         <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
             <h1>Overview</h1>
             <Search onSearch={() => {
-            }} enterButton placeholder={'Поиск по тикеру'}/>
+            }} enterButton placeholder={'Поиск по тикеру'}
+                    style={{width: '300px', alignSelf: 'flex-end'}}>
+                <In
+            </Search>
             <Radio.Group onChange={(e) => handleChangeRegion(e.target.value)} value={stocksRegion}>
                 <Radio.Button value="ru">Российские акции 🇷🇺</Radio.Button>
                 <Radio.Button value="foreign">Иностранные акции</Radio.Button>
