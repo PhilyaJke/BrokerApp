@@ -1,5 +1,5 @@
-import { useState } from "react";
-import {getStocks} from "./api";
+import {useState} from "react";
+import {getStocks, searchStocksForSuggestion} from "./api";
 import {StocksCardProps, StocksPageProps, StocksPageRequest} from "./useStocks.model";
 
 
@@ -8,7 +8,6 @@ const useStocks = () => {
     const [isDown, setIsDown] = useState<boolean>(false);
     const [page, setPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(1);
-
 
 
     const handleStocks = async (props: StocksPageRequest): Promise<StocksCardProps[]> => {
@@ -27,10 +26,25 @@ const useStocks = () => {
         }
     }
 
+    const handleSearchForSuggestions = async (search: string): Promise<StocksCardProps[]> => {
+        setIsLoading(true);
+        try {
+            const stocks: StocksCardProps[] = await searchStocksForSuggestion(search);
+            setIsLoading(false);
+            setIsDown(false)
+            return stocks
+        } catch (e) {
+            setIsLoading(false);
+            setIsDown(true);
+            return [];
+        }
+    }
+
     return {
         isLoading,
         isDown,
         handleStocks,
+        handleSearchForSuggestions,
         totalPages,
     };
 };

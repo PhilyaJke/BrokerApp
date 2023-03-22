@@ -20,16 +20,16 @@ const AppWrapper = styled.div`
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
         <TokenProvider>
-        <AuthProvider>
-            <ThemeProvider theme={darkTheme}>
-                <GlobalStyle/>
-                <BrowserRouter>
-                    <AppWrapper>
-                        <App/>
-                    </AppWrapper>
-                </BrowserRouter>
-            </ThemeProvider>
-        </AuthProvider>
+            <AuthProvider>
+                <ThemeProvider theme={darkTheme}>
+                    <GlobalStyle/>
+                    <BrowserRouter>
+                        <AppWrapper>
+                            <App/>
+                        </AppWrapper>
+                    </BrowserRouter>
+                </ThemeProvider>
+            </AuthProvider>
         </TokenProvider>
     </React.StrictMode>
 )

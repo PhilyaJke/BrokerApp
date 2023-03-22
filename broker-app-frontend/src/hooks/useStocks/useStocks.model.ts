@@ -14,7 +14,6 @@ export interface StocksPageRequest {
 }
 
 
-
 export interface StocksPageProps {
     "securitiesList": StocksCardProps[];
     "currentPage": number;

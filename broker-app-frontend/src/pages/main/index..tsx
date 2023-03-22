@@ -1,7 +1,6 @@
 import {List, message} from 'antd';
 import {Link} from 'react-router-dom';
 import {useAuth} from "../../providers/authProvider/authProvider";
-import {useCallback, useMemo} from "react";
 
 export const MainPage = () => {
     const data = [
@@ -10,12 +9,12 @@ export const MainPage = () => {
         {id: 3, name: 'Профиль (защищеная страница)', link: '/profile'},
     ];
     const {isAuth, isDown} = useAuth();
-        if (isDown) {
-            message.error('Бэкенд авторизации не работает☠️', 3);
-        }
-        if (!isAuth) {
-            message.info('Вы не авторизованы', 1);
-        }
+    if (isDown) {
+        message.error('Бэкенд авторизации не работает☠️', 3);
+    }
+    if (!isAuth) {
+        message.info('Вы не авторизованы', 1);
+    }
     return (
         <>
             <h2 style={{color: 'white'}}>MainPage</h2>

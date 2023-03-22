@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import jwtDecode from 'jwt-decode';
-import { login, register, refreshAccessToken } from './api';
+import {login, refreshAccessToken, register} from './api';
 import AuthTokens, {LoginReq, RegisterReq, TokenContextValue} from "./models";
 
 
@@ -9,7 +9,7 @@ const refreshTokenLocalStorageKey = 'ref_t';
 
 const TokenContext = createContext<TokenContextValue | null>(null);
 
-export function TokenProvider({ children }: { children: React.ReactNode }) {
+export function TokenProvider({children}: { children: React.ReactNode }) {
     const [tokens, setTokens] = useState<AuthTokens>({
         accessToken: null,
         refreshToken: localStorage.getItem(refreshTokenLocalStorageKey),
@@ -20,7 +20,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     }, [tokens.refreshToken]);
 
     return (
-        <TokenContext.Provider value={{ tokens, setTokens }}>
+        <TokenContext.Provider value={{tokens, setTokens}}>
             {children}
         </TokenContext.Provider>
     );
@@ -57,8 +57,8 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const { tokens, setTokens } = useContext(TokenContext)!;
+export function AuthProvider({children}: { children: React.ReactNode }) {
+    const {tokens, setTokens} = useContext(TokenContext)!;
     const [username, setUsername] = useState<string | null>(null);
     const [isDown, setIsDown] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -78,20 +78,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUsername(null);
             return;
         }
-        const { username } = jwtDecode<{ username: string }>(tokens.accessToken);
+        const {username} = jwtDecode<{ username: string }>(tokens.accessToken);
         setUsername(username);
     }, [tokens.accessToken]);
 
     const handleRefreshAccessToken = async () => {
         try {
-            const { refreshToken } = tokens;
+            const {refreshToken} = tokens;
 
             if (!refreshToken) {
                 return;
             }
 
-            const { accessToken } = await refreshAccessToken(refreshToken);
-            setTokens({ accessToken, refreshToken });
+            const {accessToken} = await refreshAccessToken(refreshToken);
+            setTokens({accessToken, refreshToken});
         } catch (error) {
             console.error(`Failed to refresh access token: ${error}`);
             setIsDown(true);
@@ -112,8 +112,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const handleLogin = async (req: LoginReq) => {
         try {
-            const { accessToken, refreshToken, username } = await login(req);
-            setTokens({ accessToken, refreshToken });
+            const {accessToken, refreshToken, username} = await login(req);
+            setTokens({accessToken, refreshToken});
             setUsername(username);
         } catch (error) {
             console.error(`Failed to login: ${error}`);
@@ -123,8 +123,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const handleRegister = async (req: RegisterReq) => {
         try {
-            const { accessToken, refreshToken, username } = await register(req);
-            setTokens({ accessToken, refreshToken });
+            const {accessToken, refreshToken, username} = await register(req);
+            setTokens({accessToken, refreshToken});
             setUsername(username);
         } catch (error) {
             console.error(`Failed to register: ${error}`);
@@ -134,13 +134,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const handleLogout = () => {
         setUsername(null);
-        setTokens({ accessToken: null, refreshToken: null });
+        setTokens({accessToken: null, refreshToken: null});
         localStorage.removeItem(refreshTokenLocalStorageKey);
     };
 
     return (
         <AuthContext.Provider
-            value={{ login: handleLogin, register: handleRegister, logout: handleLogout, username, isDown, isLoading }}
+            value={{login: handleLogin, register: handleRegister, logout: handleLogout, username, isDown, isLoading}}
         >
             {children}
         </AuthContext.Provider>
