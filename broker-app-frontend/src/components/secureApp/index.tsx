@@ -5,46 +5,83 @@ import {Header} from "antd/es/layout/layout";
 import {Menu, Popconfirm} from "antd";
 import {useAuth} from "../../providers/authProvider/authProvider";
 import SettingsPage from "../../pages/settings/index.";
+import {useNavigation} from "react-router-dom";
+//Массив с данными для меню
+
+
 
 const SecureApp = () => {
     const {logout} = useAuth();
+
     const navigator = useNavigate();
+
     const handleSignOut = () => {
         logout();
-        window.location.assign('/auth');
+        return navigator('/auth');
     }
+
+    const menuItems = [
+        {
+            label: <h1>Teenvest</h1>,
+            key: 'logo',
+            onClick: () => navigator('/overview'),
+            className: 'logo',
+        },
+        {
+            label: 'Главная',
+            key: 'overview',
+            onClick: () => navigator('/overview'),
+            className: 'menu-item',
+        },
+        {
+            label: 'Профиль',
+            key: 'profile',
+            onClick: () => navigator('/profile'),
+            className: 'menu-item',
+        },
+        {
+            label: 'Настройки',
+            key: 'settings',
+            onClick: () => navigator('/settings'),
+            className: 'menu-item',
+        },
+        {
+            label: <Popconfirm
+                title="Вы уверены, что хотите выйти?"
+                onConfirm={handleSignOut}
+                okText="Да"
+                cancelText="Нет"
+            >
+                <a>Выйти</a>
+            </Popconfirm>,
+            key: 'logout',
+            className: 'menu-item',
+        }
+    ];
+
+
+// Массив с данными для роутов
+    const routes = [
+        {path: "/overview", element: <Overview/>},
+        {path: "/profile", element: <ProfilePage/>},
+        {path: "/settings", element: <SettingsPage/>},
+    ];
+
     return (
         <>
-            <Header style={{width: '100%'}}>
-                <Menu theme="dark" mode="horizontal" selectedKeys={[]}>
-                    <Menu.Item key="logo" onClick={() => navigator('/overview')}><h1>Broker App</h1></Menu.Item>
-                    <Menu.Item key="overview" onClick={() => navigator('/overview')}>
-                        Главная
-                    </Menu.Item>
-                    <Menu.Item key="profile" onClick={() => navigator('/profile')}>
-                        Профиль
-                    </Menu.Item>
-                    <Menu.Item key="settings" onClick={() => navigator('/settings')}>
-                        Настройки
-                    </Menu.Item>
-                    <Popconfirm title={"Точно?"} onConfirm={handleSignOut} okText={"Да"} cancelText={"Нет"}>
-                        <Menu.Item key="sign-out">
-                            Выйти
-                        </Menu.Item>
-                    </Popconfirm>
-                </Menu>
+            <Header style={{width: '100%', paddingInline: '0'}}>
+                <Menu theme="dark" mode="horizontal" selectedKeys={[]} items={menuItems}/>
             </Header>
             <main>
                 <Routes>
-                    <Route path={"/overview"} element={<Overview/>}/>
-                    <Route path={'/profile'} element={<ProfilePage/>}/>
-                    <Route path={'/settings'} element={<SettingsPage/>}/>
-                    <Route path={"*"} element={<Navigate to={"/overview"}/>}/>
+                  {/*Используем map для отрисовки роутов из массива*/}
+                  {routes.map((route, index) => (
+                    <Route path={route.path} element={route.element} key={index}/>
+                  ))}
+                  {/*// Добавляем редирект на главную для несуществующих путей*/}
+                  <Route path={"*"} element={<Navigate to={"/overview"}/>}/>
                 </Routes>
             </main>
-            <footer>
-                <p>Broker App 2023</p>
-            </footer>
         </>
     )
 }

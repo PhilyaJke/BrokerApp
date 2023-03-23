@@ -1,4 +1,4 @@
-import {memo, useEffect, useMemo, useRef, useState} from "react";
+import {memo, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import useStocks from "../../hooks/useStocks/useStocks";
 import {StocksCardProps, StocksPageRequest} from "../../hooks/useStocks/useStocks.model";
 import {AutoComplete, Button, Card, Radio} from "antd";
@@ -43,7 +43,7 @@ const OverviewPage = () => {
         }
     }, [seachValue]);
 
-    const searchSuggestions = () => {
+    const searchSuggestions = useMemo(() => {
         return searchResult.map((stock) => {
             return {
                 value: stock.ticker,
@@ -53,12 +53,13 @@ const OverviewPage = () => {
                 </div>),
             };
         });
-    }
+    }, [searchResult]);
 
-    const searchStocksForSuggestions = async (value: string): Promise<void> => {
-        const searchResult = await handleSearchForSuggestions(value);
-        setSearchResult(searchResult);
-    }
+    const searchStocksForSuggestions = useCallback((value: string) => {
+        handleSearchForSuggestions(value).then((res) => {
+            setSearchResult(res);
+        });
+    }, [handleSearchForSuggestions]);
 
 
     const handleChangeRegion = (e: 'ru' | 'foreign' | 'all') => {
@@ -71,26 +72,12 @@ const OverviewPage = () => {
     const getStocks = async () => {
         const stocks = await handleStocks({page, size, region: stocksRegion} as StocksPageRequest);
         setMaxPage(maxPage);
-        //if region change, clear stocksCard
         if (page === 0) {
             setStocksCard(stocks);
             return;
         }
         setStocksCard(prevStocks => [...prevStocks, ...stocks]);
     };
-
-
-    // const handleObserver = useCallback((entries: any[]) => {
-    //     const target = entries[0];
-    //     if (target.isIntersecting) {
-    //         setPage(prevPage => prevPage + 1);
-    //         console.log('page', page);
-    //     }
-    // }, []);
-    //
-    // const observer = useMemo(() => {
-    //     return new IntersectionObserver(handleObserver, {threshold: 0.75});
-    // }, [handleObserver, loaderRef]);
 
 
     const stocksList = useMemo(() => {
@@ -104,18 +91,6 @@ const OverviewPage = () => {
             return <StocksCard key={index} {...stock}/>;
         });
     }, [stocksCard, page, stocksRegion, loaderRef]);
-
-    // useEffect(() => {
-    //     const loader = loaderRef.current;
-    //     if (loader) {
-    //         observer.observe(loader);
-    //     }
-    //     return () => {
-    //         if (loader) {
-    //             observer.unobserve(loader);
-    //         }
-    //     };
-    // }, [observer, loaderRef]);
 
     useEffect(() => {
         getStocks();
@@ -139,10 +114,8 @@ const OverviewPage = () => {
     return (
         <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
             <h1>Overview</h1>
-            {/*<Search onSearch={() => {*/}
-            {/*}} enterButton placeholder={'Поиск по тикеру'}/>*/}
             <AutoComplete
-                options={searchSuggestions()}
+                options={searchSuggestions}
                 onSelect={(value) => {
                     setSearchValue(value);
                     setSearchResult([]);
@@ -163,20 +136,7 @@ const OverviewPage = () => {
             </Radio.Group>
             <p>{stocksRegion === 'ru' ? 'Российские акции' : stocksRegion === 'foreign' ? 'Иностранные акции' : 'Все'}</p>
             {isDown && <p>Сервер недоступен</p>}
-            {/*{isLoading && <p>Загрузка...</p>}*/}
             <div style={{display: 'flex', gap: '10px', flexWrap: 'wrap'}}>
-                {/*{!isLoading && !isDown && stocksCard.map((stock, index) => {*/}
-                {/*    if (index === stocksCard.length - 1) {*/}
-                {/*        return (*/}
-                {/*            <div key={index} ref={loaderRef}>*/}
-                {/*                Загрузка...*/}
-                {/*            </div>*/}
-                {/*        );*/}
-                {/*    }*/}
-                {/*    return (*/}
-                {/*        <StocksCard key={index} {...stock}/>*/}
-                {/*    )*/}
-                {/*})}*/}
                 {stocksList}
             </div>
         </div>
