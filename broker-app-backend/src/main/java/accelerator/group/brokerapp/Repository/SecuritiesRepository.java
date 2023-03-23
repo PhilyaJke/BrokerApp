@@ -21,14 +21,11 @@ public interface SecuritiesRepository extends JpaRepository<Securities, Long> {
     Securities findSecurityByFigi(@Param(value = "figi") String figi);
 
     @Modifying
-    @Query("UPDATE Securities s SET s.Lastprice = ?1 WHERE s.Figi = ?2")
-    void updateLastPrices(@Param(value = "lastPrice") String lastPrice, @Param(value = "figi") String figi);
+    @Query("UPDATE Securities s SET s.price = ?1 WHERE s.Figi = ?2")
+    void updateLastPrices(@Param(value = "price") Double price, @Param(value = "figi") String figi);
 
     @Query(value = "SELECT s.figi FROM Securities s", nativeQuery = true)
     Page<String> findLimitedSecurities(Pageable pageable);
-
-
-
 
     @Query("SELECT s FROM Securities s WHERE s.region = 'RU'")
     Page<Securities> findAllRuSecuritiesPage(Pageable pageable);

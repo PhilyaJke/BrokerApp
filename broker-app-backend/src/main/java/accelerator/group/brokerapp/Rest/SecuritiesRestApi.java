@@ -51,6 +51,7 @@ public class SecuritiesRestApi {
 
     @PostMapping("/api/securities/list/search")
     public ResponseEntity findSecuritiesInSearch(@RequestBody String search){
+        log.info("поиск по акциям");
         String request = decodeJson(search, "search");
         List<Securities> securities = securitiesRepository.findAll();
         var response = securities.stream().filter((s) -> s.getName().toLowerCase(Locale.ROOT).contains(request.toLowerCase(Locale.ROOT)) ||

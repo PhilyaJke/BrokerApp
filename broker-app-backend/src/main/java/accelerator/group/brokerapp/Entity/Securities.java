@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class Securities {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @JsonIgnore
     private long id;
@@ -43,8 +43,8 @@ public class Securities {
     @Column(name = "sector")
     private String Sector;
 
-    @Column(name = "last_price")
-    private Long Lastprice;
+    @Column(name = "price")
+    private Double price;
 
     public Securities() {
 
