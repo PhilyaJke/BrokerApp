@@ -3,7 +3,7 @@ export interface StocksCardProps {
     region: string;
     sector: string;
     ticker: string;
-    lastprice: number;
+    price: number;
 }
 
 

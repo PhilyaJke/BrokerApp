@@ -6,13 +6,13 @@ import Search from "antd/es/input/Search";
 import AppLoader from "../../components/appLoader";
 //PRIVATE ROUTE
 
-const StocksCard = memo(({ticker, name, region, sector, lastprice}: StocksCardProps) => {
+const StocksCard = memo(({ticker, name, region, sector, price}: StocksCardProps) => {
     return (
         <Card title={ticker} style={{width: 300}}>
             <p>{name}</p>
             <p>{region}</p>
             <p>{sector}</p>
-            <p>{String(lastprice)}$</p>
+            <p>{String(price)}$</p>
         </Card>
     );
 });
