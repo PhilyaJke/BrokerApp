@@ -1,19 +1,18 @@
-import {useEffect, useState, useRef, memo, useCallback, useMemo} from "react";
+import {memo, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import useStocks from "../../hooks/useStocks/useStocks";
 import {StocksCardProps, StocksPageRequest} from "../../hooks/useStocks/useStocks.model";
-import {Card, Radio} from "antd";
+import {AutoComplete, Button, Card, Radio} from "antd";
 import Search from "antd/es/input/Search";
-import {getStocks} from "../../hooks/useStocks/api";
 import AppLoader from "../../components/appLoader";
-
 //PRIVATE ROUTE
 
-const StocksCard = memo(({ticker, name, region, sector}: StocksCardProps) => {
+const StocksCard = memo(({ticker, name, region, sector, price}: StocksCardProps) => {
     return (
         <Card title={ticker} style={{width: 300}}>
             <p>{name}</p>
             <p>{region}</p>
             <p>{sector}</p>
+            <p>{String(price)}$</p>
         </Card>
     );
 });
@@ -21,12 +20,46 @@ const StocksCard = memo(({ticker, name, region, sector}: StocksCardProps) => {
 
 const OverviewPage = () => {
     const [stocksRegion, setStocksRegion] = useState<'ru' | 'foreign' | 'all'>('ru');
-    const {handleStocks, isDown, isLoading, totalPages} = useStocks();
+    const {handleStocks, isDown, isLoading, totalPages, handleSearchForSuggestions} = useStocks();
     const [stocksCard, setStocksCard] = useState<StocksCardProps[]>([]);
+    const [seachValue, setSearchValue] = useState<string>('');
+    const [searchResult, setSearchResult] = useState<StocksCardProps[]>([]);
     const size = 40;
     const [page, setPage] = useState(0);
     const [maxPage, setMaxPage] = useState(1);
     const loaderRef = useRef<HTMLDivElement>(null);
+
+    const handleChangeSearch = (e: any) => {
+        console.log(e);
+        setSearchValue(e);
+    }
+
+
+    useEffect(() => {
+        if (seachValue === '') {
+            setSearchResult([]);
+        } else {
+            searchStocksForSuggestions(seachValue);
+        }
+    }, [seachValue]);
+
+    const searchSuggestions = useMemo(() => {
+        return searchResult.map((stock) => {
+            return {
+                value: stock.ticker,
+                label: (<div style={{display: 'flex', flexDirection: 'column'}}>
+                    <span><code>{stock.ticker}</code></span>
+                    <span><b>{stock.name}</b></span>
+                </div>),
+            };
+        });
+    }, [searchResult]);
+
+    const searchStocksForSuggestions = useCallback((value: string) => {
+        handleSearchForSuggestions(value).then((res) => {
+            setSearchResult(res);
+        });
+    }, [handleSearchForSuggestions]);
 
 
     const handleChangeRegion = (e: 'ru' | 'foreign' | 'all') => {
@@ -39,27 +72,12 @@ const OverviewPage = () => {
     const getStocks = async () => {
         const stocks = await handleStocks({page, size, region: stocksRegion} as StocksPageRequest);
         setMaxPage(maxPage);
-        //if region change, clear stocksCard
         if (page === 0) {
             setStocksCard(stocks);
             return;
         }
         setStocksCard(prevStocks => [...prevStocks, ...stocks]);
     };
-
-
-
-    // const handleObserver = useCallback((entries: any[]) => {
-    //     const target = entries[0];
-    //     if (target.isIntersecting) {
-    //         setPage(prevPage => prevPage + 1);
-    //         console.log('page', page);
-    //     }
-    // }, []);
-    //
-    // const observer = useMemo(() => {
-    //     return new IntersectionObserver(handleObserver, {threshold: 0.75});
-    // }, [handleObserver, loaderRef]);
 
 
     const stocksList = useMemo(() => {
@@ -69,21 +87,10 @@ const OverviewPage = () => {
                     <AppLoader key={index}/>
                 );
             }
-            return <StocksCard key={index} {...stock} />;
+            //TODO REMOVE TEST PRICE
+            return <StocksCard key={index} {...stock}/>;
         });
     }, [stocksCard, page, stocksRegion, loaderRef]);
-
-    // useEffect(() => {
-    //     const loader = loaderRef.current;
-    //     if (loader) {
-    //         observer.observe(loader);
-    //     }
-    //     return () => {
-    //         if (loader) {
-    //             observer.unobserve(loader);
-    //         }
-    //     };
-    // }, [observer, loaderRef]);
 
     useEffect(() => {
         getStocks();
@@ -107,29 +114,29 @@ const OverviewPage = () => {
     return (
         <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
             <h1>Overview</h1>
-            <Search onSearch={() => {
-            }} enterButton placeholder={'Поиск по тикеру'}/>
+            <AutoComplete
+                options={searchSuggestions}
+                onSelect={(value) => {
+                    setSearchValue(value);
+                    setSearchResult([]);
+                }
+                }
+                onSearch={(value) => {
+                    setSearchValue(value);
+                }
+                }
+            >
+                <Search placeholder="Поиск по тикеру" enterButton/>
+                <Button>Поиск</Button>
+            </AutoComplete>
             <Radio.Group onChange={(e) => handleChangeRegion(e.target.value)} value={stocksRegion}>
                 <Radio.Button value="ru">Российские акции 🇷🇺</Radio.Button>
                 <Radio.Button value="foreign">Иностранные акции</Radio.Button>
                 <Radio.Button value="all">Все 🌍</Radio.Button>
             </Radio.Group>
             <p>{stocksRegion === 'ru' ? 'Российские акции' : stocksRegion === 'foreign' ? 'Иностранные акции' : 'Все'}</p>
+            {isDown && <p>Сервер недоступен</p>}
             <div style={{display: 'flex', gap: '10px', flexWrap: 'wrap'}}>
-                {isLoading && <p>Загрузка...</p>}
-                {isDown && <p>Сервер недоступен</p>}
-                {/*{!isLoading && !isDown && stocksCard.map((stock, index) => {*/}
-                {/*    if (index === stocksCard.length - 1) {*/}
-                {/*        return (*/}
-                {/*            <div key={index} ref={loaderRef}>*/}
-                {/*                Загрузка...*/}
-                {/*            </div>*/}
-                {/*        );*/}
-                {/*    }*/}
-                {/*    return (*/}
-                {/*        <StocksCard key={index} {...stock}/>*/}
-                {/*    )*/}
-                {/*})}*/}
                 {stocksList}
             </div>
         </div>

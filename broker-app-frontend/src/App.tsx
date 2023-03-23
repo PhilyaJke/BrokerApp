@@ -4,9 +4,7 @@ import RegisterPage from "./pages/register";
 import {MainPage} from "./pages/main/index.";
 import {useAuth, useIsAuthenticated} from "./providers/authProvider/authProvider";
 import SecureApp from "./components/secureApp";
-import styled from "styled-components";
 import AppLoader from "./components/appLoader";
-import serviceIsUnavailablePage from "./pages/serviceIsUnavailable";
 import ServiceIsUnavailablePage from "./pages/serviceIsUnavailable";
 
 const App = () => {
@@ -32,17 +30,17 @@ const App = () => {
     }
     if (isAuth) {
         return (
-                <SecureApp/>
+            <SecureApp/>
         )
     }
     return (
-            <Routes>
-                <Route path={"/"} element={<MainPage/>}/>
-                <Route path={"/auth"} element={<AuthPage/>}/>
-                <Route path={"/register"} element={<RegisterPage/>}/>
-                <Route path={"*"} element={<Navigate to={"/"}/>}/>
-                {/*<Route path={"*"} element={<h2>404.<br/>Page not exist :-(</h2>}/>*/}
-            </Routes>
+        <Routes>
+            <Route path={"/"} element={<MainPage/>}/>
+            <Route path={"/auth"} element={<AuthPage/>}/>
+            <Route path={"/register"} element={<RegisterPage/>}/>
+            <Route path={"*"} element={<Navigate to={"/"}/>}/>
+            {/*<Route path={"*"} element={<h2>404.<br/>Page not exist :-(</h2>}/>*/}
+        </Routes>
     )
 }
 

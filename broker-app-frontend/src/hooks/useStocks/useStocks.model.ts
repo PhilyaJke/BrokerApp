@@ -3,6 +3,7 @@ export interface StocksCardProps {
     region: string;
     sector: string;
     ticker: string;
+    price: number;
 }
 
 
@@ -11,7 +12,6 @@ export interface StocksPageRequest {
     size?: number;
     region?: 'ru' | 'foreign' | 'all';
 }
-
 
 
 export interface StocksPageProps {

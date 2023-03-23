@@ -2,7 +2,7 @@ import styled from "styled-components";
 import {Button, Card, Form, Input, message} from 'antd';
 import {useFormik} from "formik";
 import * as Yup from "yup";
-import {useAuth} from "../../providers/authProvider/authProvider";
+import {useAuth, useIsAuthenticated} from "../../providers/authProvider/authProvider";
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 
@@ -19,8 +19,8 @@ const validationSchema = Yup.object().shape({
 const AuthPage = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const {isAuth, login} = useAuth();
-
+    const {login} = useAuth();
+    const isAuth = useIsAuthenticated();
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -31,13 +31,6 @@ const AuthPage = () => {
             console.log('submit');
             try {
                 const res = await login(values);
-                console.log(res);
-                if (res.status === 'ok') {
-                    console.log(res);
-                    return navigate('/profile');
-                } else {
-                    message.error(res.message);
-                }
             } catch (error) {
                 console.error(error);
                 message.error('Ошибка при авторизации');
