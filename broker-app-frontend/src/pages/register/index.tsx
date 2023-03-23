@@ -34,14 +34,7 @@ const RegisterPage = () => {
             console.log('submit');
             try {
                 const res = await register(values);
-                console.log(res);
-                if (res.status === 'ok') {
-                    console.log(res);
-                    return navigate('/profile');
-                } else {
-                    setError(res.message);
-                    message.error(error);
-                }
+                return navigate('/auth');
             } catch (error) {
                 console.error(error);
                 setError('Ошибка при регистрации');
