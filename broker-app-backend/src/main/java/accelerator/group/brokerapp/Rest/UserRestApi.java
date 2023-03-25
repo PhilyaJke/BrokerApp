@@ -10,7 +10,6 @@ import accelerator.group.brokerapp.Requests.RegistrationRequest;
 import accelerator.group.brokerapp.Requests.AuthenticationRequest;
 import accelerator.group.brokerapp.Security.JwtTokenProvider;
 import accelerator.group.brokerapp.Service.UserService.UserServiceImpl;
-import accelerator.group.brokerapp.TinkoffInvestApi.run;
 import com.owlike.genson.Genson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,18 +47,16 @@ public class UserRestApi {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final UserServiceImpl userService;
-//    private final run r;
 
     @Autowired
     public UserRestApi(UserRepository userRepository,
                        RefreshTokensRepository refreshTokensRepository, JwtTokenProvider jwtTokenProvider,
-                       AuthenticationManager authenticationManager, UserServiceImpl userService, run r) {
+                       AuthenticationManager authenticationManager, UserServiceImpl userService) {
         this.userRepository = userRepository;
         this.refreshTokensRepository = refreshTokensRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
-//        this.r = r;
     }
 
     @Transactional
@@ -69,7 +66,6 @@ public class UserRestApi {
         User user = userRepository.findByEmail(authenticationRequest.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User doesnt exist"));
 
-//        r.init();
 
         String AccessToken = "";
         String RefreshToken = "";

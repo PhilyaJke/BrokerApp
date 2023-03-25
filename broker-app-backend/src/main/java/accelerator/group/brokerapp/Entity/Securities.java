@@ -1,11 +1,28 @@
 package accelerator.group.brokerapp.Entity;
 
+import accelerator.group.brokerapp.Responses.StocksResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+
+
+
+@NamedNativeQuery(
+        name = "GetAllStocksInfoForSearch",
+        query = "SELECT s.region, asi.price, s.name, s.ticker, s.sector FROM Securities s INNER JOIN additional_stocks_info asi ON asi.id = s.add_info_id",
+        resultSetMapping = "Mapping.StocksResponseForSearch")
+
+@SqlResultSetMapping(name = "Mapping.StocksResponseForSearch",
+        classes = @ConstructorResult(targetClass = StocksResponse.class,
+        columns = {@ColumnResult(name = "region"),
+                @ColumnResult(name = "price"),
+                @ColumnResult(name = "name"),
+                @ColumnResult(name = "ticker"),
+                @ColumnResult(name = "sector")}
+        ))
 
 @Entity
 @Data
@@ -32,21 +49,23 @@ public class Securities {
     @Column(name = "region")
     private String region;
 
-    @Column(name = "lot")
-    @JsonIgnore
-    private int Lot;
-
-    @Column(name = "first_candle_day")
-    @JsonIgnore
-    private String Date;
-
     @Column(name = "sector")
     private String Sector;
 
-    @Column(name = "price")
-    private Double price;
+    @OneToOne
+    @JoinColumn(name = "add_info_id")
+    private AdditionalStocksInfo additionalStocksInfo;
 
     public Securities() {
 
+    }
+
+    public Securities(String figi, String name, String ticker, String region, String sector, AdditionalStocksInfo additionalStocksInfo) {
+        Figi = figi;
+        Name = name;
+        Ticker = ticker;
+        this.region = region;
+        Sector = sector;
+        this.additionalStocksInfo = additionalStocksInfo;
     }
 }

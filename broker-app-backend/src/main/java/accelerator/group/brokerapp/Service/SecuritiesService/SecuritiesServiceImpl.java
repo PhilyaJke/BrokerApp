@@ -3,6 +3,7 @@ package accelerator.group.brokerapp.Service.SecuritiesService;
 import accelerator.group.brokerapp.Entity.Securities;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
 import accelerator.group.brokerapp.Responses.SecuritiesPageResponse;
+import accelerator.group.brokerapp.Responses.StocksResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
