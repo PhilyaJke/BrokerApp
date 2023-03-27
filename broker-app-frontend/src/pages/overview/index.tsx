@@ -6,6 +6,19 @@ import Search from "antd/es/input/Search";
 import AppLoader from "../../components/appLoader";
 //PRIVATE ROUTE
 
+
+//плашка для показа что все акции загружены
+const EndOfStocks = () => {
+    return (
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
+        <Card style={{width: 300}}>
+            <p>Конец списка</p>
+        </Card>
+        </div>
+    );
+};
+
+
 const StocksCard = memo(({ticker, name, region, sector, price}: StocksCardProps) => {
     return (
         <Card title={ticker} style={{width: 300}}>
@@ -24,6 +37,7 @@ const OverviewPage = () => {
     const [stocksCard, setStocksCard] = useState<StocksCardProps[]>([]);
     const [seachValue, setSearchValue] = useState<string>('');
     const [searchResult, setSearchResult] = useState<StocksCardProps[]>([]);
+    const [isEnd, setIsEnd] = useState<boolean>(false);
     const size = 40;
     const [page, setPage] = useState(0);
     const [maxPage, setMaxPage] = useState(1);
@@ -71,6 +85,10 @@ const OverviewPage = () => {
 
     const getStocks = async () => {
         const stocks = await handleStocks({page, size, region: stocksRegion} as StocksPageRequest);
+        if (!Boolean(stocks) || stocks.length === 0) {
+            setIsEnd(true);
+            return;
+        }
         setMaxPage(maxPage);
         if (page === 0) {
             setStocksCard(stocks);
@@ -82,19 +100,26 @@ const OverviewPage = () => {
 
     const stocksList = useMemo(() => {
         return stocksCard.map((stock, index) => {
+            if (isEnd && index === stocksCard.length - 1) return (<EndOfStocks key={index}/>);
+
             if (index === stocksCard.length - 1) {
                 return (
                     <AppLoader key={index}/>
                 );
             }
-            //TODO REMOVE TEST PRICE
             return <StocksCard key={index} {...stock}/>;
         });
     }, [stocksCard, page, stocksRegion, loaderRef]);
 
     useEffect(() => {
+        if (isEnd) setIsEnd(false);
+        getStocks()
+    }, [stocksRegion]);
+
+    useEffect(() => {
+        if (isEnd) return;
         getStocks();
-    }, [page, stocksRegion]);
+    }, [page]);
 
     useEffect(() => {
         getStocks();
@@ -105,6 +130,7 @@ const OverviewPage = () => {
     }, []);
 
     const handleScroll = () => {
+        if (isEnd) return;
         const {scrollHeight, scrollTop, clientHeight} = document.documentElement;
         if (scrollTop + clientHeight >= scrollHeight * 0.9) {
             setPage(prevPage => prevPage + 1);

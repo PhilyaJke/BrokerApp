@@ -16,6 +16,6 @@ export interface StocksPageRequest {
 
 export interface StocksPageProps {
     "securitiesList": StocksCardProps[];
-    "currentPage": number;
-    "totalPages": number;
+    // "currentPage": number;
+    // "totalPages": number;
 }
