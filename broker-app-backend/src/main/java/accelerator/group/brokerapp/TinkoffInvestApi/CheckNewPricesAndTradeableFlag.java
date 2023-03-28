@@ -1,8 +1,8 @@
 package accelerator.group.brokerapp.TinkoffInvestApi;
 
-import accelerator.group.brokerapp.Entity.AdditionalStocksInfo;
+import accelerator.group.brokerapp.Entity.AdditionalStocksInformation;
 import accelerator.group.brokerapp.Entity.Securities;
-import accelerator.group.brokerapp.Repository.AdditionalStocksInfoRepository;
+import accelerator.group.brokerapp.Repository.AdditionalStocksInformationRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +27,15 @@ public class CheckNewPricesAndTradeableFlag {
 
     private InvestApi investApi;
     private final SecuritiesRepository securitiesRepository;
-    private final AdditionalStocksInfoRepository additionalStocksInfoRepository;
+    private final AdditionalStocksInformationRepository additionalStocksInformationRepository;
 
     @Autowired
     public CheckNewPricesAndTradeableFlag(SecuritiesRepository securitiesRepository,
-                                          @Value("${invest.api.secret.token}") String token, AdditionalStocksInfoRepository additionalStocksInfoRepository) {
+                                          @Value("${invest.api.secret.token}") String token,
+                                          AdditionalStocksInformationRepository additionalStocksInformationRepository) {
         this.securitiesRepository = securitiesRepository;
         this.investApi = InvestApi.create(token);
-        this.additionalStocksInfoRepository = additionalStocksInfoRepository;
+        this.additionalStocksInformationRepository = additionalStocksInformationRepository;
     }
 
 
@@ -52,10 +53,10 @@ public class CheckNewPricesAndTradeableFlag {
                 }else{
                     for (int k = 0; k < securities.getNumberOfElements(); k++) {
                         if (!securitiesRepository.findSecurityByFigi(lastprices.get(j).getFigi()).equals(null)) {
-                            var sec = securitiesRepository.findSecurityByFigi(lastprices.get(j).getFigi()).getAdditionalStocksInfo();
+                            var sec = securitiesRepository.findSecurityByFigi(lastprices.get(j).getFigi()).getAdditionalStocksInformation();
                             sec.setPrice(Double.valueOf(String.valueOf(lastprices.get(j).getPrice().getUnits()).concat(".")
                                     .concat(String.valueOf(lastprices.get(j).getPrice().getNano()))));
-                            additionalStocksInfoRepository.save(sec);
+                            additionalStocksInformationRepository.save(sec);
                             break;
                         }
                     }
@@ -74,10 +75,10 @@ public class CheckNewPricesAndTradeableFlag {
             for (int i = 0; i < shares.size(); i++) {
                 if (!securitiesRepository.findAllFigiSecurities().contains(shares.get(i).getFigi())) {
 
-                    AdditionalStocksInfo additionalStocksInfo = new AdditionalStocksInfo(
+                    AdditionalStocksInformation additionalStocksInformation = new AdditionalStocksInformation(
                             shares.get(i).getLot()
                     );
-                    additionalStocksInfoRepository.save(additionalStocksInfo);
+                    additionalStocksInformationRepository.save(additionalStocksInformation);
 
                     Securities securities = new Securities(
                             shares.get(i).getFigi(),
@@ -85,7 +86,7 @@ public class CheckNewPricesAndTradeableFlag {
                             shares.get(i).getTicker(),
                             shares.get(i).getCountryOfRisk(),
                             shares.get(i).getSector(),
-                            additionalStocksInfo
+                            additionalStocksInformation
                     );
                     securitiesRepository.save(securities);
                 }

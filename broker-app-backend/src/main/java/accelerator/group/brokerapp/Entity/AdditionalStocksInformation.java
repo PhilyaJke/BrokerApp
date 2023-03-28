@@ -1,5 +1,6 @@
 package accelerator.group.brokerapp.Entity;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,26 +10,27 @@ import javax.persistence.*;
 @Entity
 @Data
 @AllArgsConstructor
-@Table(name = "AdditionalStocksInfo")
-public class AdditionalStocksInfo {
+@Table(name = "AdditionalStocksInformation")
+public class AdditionalStocksInformation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @JsonIgnore
     private long id;
+
+    @Column(name = "price")
+    private Double price;
 
     @Column(name = "lot")
     @JsonIgnore
     private int Lot;
 
-    @Column(name = "price")
-    private Double price;
-
-    public AdditionalStocksInfo() {
+    public AdditionalStocksInformation() {
 
     }
 
-    public AdditionalStocksInfo(int lot) {
+    public AdditionalStocksInformation(int lot) {
         Lot = lot;
     }
 }

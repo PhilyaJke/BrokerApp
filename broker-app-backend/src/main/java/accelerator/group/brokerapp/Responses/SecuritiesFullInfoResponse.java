@@ -7,7 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class StocksResponse {
+public class SecuritiesFullInfoResponse {
+
     private String region;
     private Double price;
     private String name;

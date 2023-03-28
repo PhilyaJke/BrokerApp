@@ -1,28 +1,56 @@
 package accelerator.group.brokerapp.Entity;
 
-import accelerator.group.brokerapp.Responses.StocksResponse;
+import accelerator.group.brokerapp.Responses.SecuritiesFullInfoResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 
 
+@NamedNativeQueries({
+        @NamedNativeQuery(
+                name = "FindFullStocksInfo",
+                query = "SELECT s.region, asi.price, s.name, s.ticker, s.sector" +
+                        " FROM securities s" +
+                        " INNER JOIN additional_stocks_information asi on asi.id = s.additional_info_id",
+                resultSetMapping = "Mapping.SecuritiesFullInfoResponse"
+        ),
 
-@NamedNativeQuery(
-        name = "GetAllStocksInfoForSearch",
-        query = "SELECT s.region, asi.price, s.name, s.ticker, s.sector FROM Securities s INNER JOIN additional_stocks_info asi ON asi.id = s.add_info_id",
-        resultSetMapping = "Mapping.StocksResponseForSearch")
+        @NamedNativeQuery(
+                name = "FindRUStocksInfo",
+                query = "SELECT s.region, asi.price, s.name, s.ticker, s.sector" +
+                        " FROM securities s" +
+                        " INNER JOIN additional_stocks_information asi on asi.id = s.additional_info_id WHERE s.region = 'RU'",
+                resultSetMapping = "Mapping.SecuritiesFullInfoResponse"
+        ),
 
-@SqlResultSetMapping(name = "Mapping.StocksResponseForSearch",
-        classes = @ConstructorResult(targetClass = StocksResponse.class,
-        columns = {@ColumnResult(name = "region"),
-                @ColumnResult(name = "price"),
-                @ColumnResult(name = "name"),
-                @ColumnResult(name = "ticker"),
-                @ColumnResult(name = "sector")}
-        ))
+        @NamedNativeQuery(
+                name = "FindForeignStocksInfo",
+                query = "SELECT s.region, asi.price, s.name, s.ticker, s.sector" +
+                        " FROM securities s" +
+                        " INNER JOIN additional_stocks_information asi on asi.id = s.additional_info_id WHERE s.region <> 'RU'",
+                resultSetMapping = "Mapping.SecuritiesFullInfoResponse"
+        ),
+
+        @NamedNativeQuery(
+                name = "CountSecurities",
+                query = "SELECT count(*) FROM securities"
+        )
+})
+
+@SqlResultSetMapping(name="Mapping.SecuritiesFullInfoResponse",
+        classes = { @ConstructorResult(targetClass = SecuritiesFullInfoResponse.class,
+                columns = {
+                        @ColumnResult(name = "region"),
+                        @ColumnResult(name = "price"),
+                        @ColumnResult(name = "name"),
+                        @ColumnResult(name = "ticker"),
+                        @ColumnResult(name = "sector"),
+                })
+        }
+)
+
 
 @Entity
 @Data
@@ -53,19 +81,20 @@ public class Securities {
     private String Sector;
 
     @OneToOne
-    @JoinColumn(name = "add_info_id")
-    private AdditionalStocksInfo additionalStocksInfo;
+    @MapsId
+    @JoinColumn(name = "additional_info_id")
+    private AdditionalStocksInformation additionalStocksInformation;
 
     public Securities() {
 
     }
 
-    public Securities(String figi, String name, String ticker, String region, String sector, AdditionalStocksInfo additionalStocksInfo) {
+    public Securities(String figi, String name, String ticker, String region, String sector, AdditionalStocksInformation additionalStocksInformation) {
         Figi = figi;
         Name = name;
         Ticker = ticker;
         this.region = region;
         Sector = sector;
-        this.additionalStocksInfo = additionalStocksInfo;
+        this.additionalStocksInformation = additionalStocksInformation;
     }
 }

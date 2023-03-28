@@ -53,7 +53,7 @@ public class SecuritiesRestApi {
     public ResponseEntity findSecuritiesInSearch(@RequestBody String search){
         log.info("поиск по акциям");
         String request = decodeJson(search, "search");
-        var securities = securitiesRepository.findAlll();
+        var securities = securitiesRepository.findAll();
         var response = securities.stream().filter((s) -> s.getName().toLowerCase(Locale.ROOT).contains(request.toLowerCase(Locale.ROOT)) ||
                 s.getTicker().toLowerCase(Locale.ROOT).contains(request.toLowerCase(Locale.ROOT))).collect(Collectors.toList()).stream().limit(5).collect(Collectors.toList());
         if(!response.isEmpty()){

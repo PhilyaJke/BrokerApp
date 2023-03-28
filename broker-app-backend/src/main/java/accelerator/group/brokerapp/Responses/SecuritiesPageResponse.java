@@ -12,8 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 public class SecuritiesPageResponse {
 
-    private List<Securities> securitiesList;
-    private int currentPage;
-    private int totalPages;
-
+    private List<SecuritiesFullInfoResponse> securitiesList;
 }
