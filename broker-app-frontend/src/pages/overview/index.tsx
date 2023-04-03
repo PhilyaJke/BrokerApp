@@ -4,25 +4,28 @@ import {StocksCardProps, StocksPageRequest} from "../../hooks/useStocks/useStock
 import {AutoComplete, Button, Card, Radio} from "antd";
 import Search from "antd/es/input/Search";
 import AppLoader from "../../components/appLoader";
-//PRIVATE ROUTE
+//use redirect
+import {useNavigate} from "react-router-dom";
 
 
 //плашка для показа что все акции загружены
 const EndOfStocks = () => {
     return (
         <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
-        <Card style={{width: 300}}>
-            <p>Конец списка</p>
-        </Card>
+            <Card style={{width: 300}}>
+                <p>Конец списка</p>
+            </Card>
         </div>
     );
 };
 
 
-const StocksCard = memo(({ticker, name, region, sector, price}: StocksCardProps) => {
+const StocksCard = memo(({ticker, name, region, sector, price, icon_path, figi}: StocksCardProps) => {
+    const navigate = useNavigate();
     return (
-        <Card title={ticker} style={{width: 300}}>
-            <p>{name}</p>
+        <Card title={ticker} style={{width: 300}} key={figi} onClick={() => navigate(`/stock/${figi}`)}>
+            <img src={icon_path} alt={figi} style={{width: 50, height: 50}}/>
+            <p><b>{name}</b></p>
             <p>{region}</p>
             <p>{sector}</p>
             <p>{String(price)}$</p>

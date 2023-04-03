@@ -5,9 +5,8 @@ import {Header} from "antd/es/layout/layout";
 import {Menu, Popconfirm} from "antd";
 import {useAuth} from "../../providers/authProvider/authProvider";
 import SettingsPage from "../../pages/settings/index.";
-import {useNavigation} from "react-router-dom";
+import Stock from "../../pages/stock";
 //Массив с данными для меню
-
 
 
 const SecureApp = () => {
@@ -65,6 +64,7 @@ const SecureApp = () => {
         {path: "/overview", element: <Overview/>},
         {path: "/profile", element: <ProfilePage/>},
         {path: "/settings", element: <SettingsPage/>},
+        {path: "/stock/:figi", element: <Stock/>},
     ];
 
     return (
@@ -74,12 +74,12 @@ const SecureApp = () => {
             </Header>
             <main>
                 <Routes>
-                  {/*Используем map для отрисовки роутов из массива*/}
-                  {routes.map((route, index) => (
-                    <Route path={route.path} element={route.element} key={index}/>
-                  ))}
-                  {/*// Добавляем редирект на главную для несуществующих путей*/}
-                  <Route path={"*"} element={<Navigate to={"/overview"}/>}/>
+                    {/*Используем map для отрисовки роутов из массива*/}
+                    {routes.map((route, index) => (
+                        <Route path={route.path} element={route.element} key={index}/>
+                    ))}
+                    {/*// Добавляем редирект на главную для несуществующих путей*/}
+                    <Route path={"*"} element={<Navigate to={"/overview"}/>}/>
                 </Routes>
             </main>
         </>
