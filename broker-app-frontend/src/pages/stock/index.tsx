@@ -95,7 +95,7 @@ const Stock = () => {
         series: [
             {
                 name: "Цена",
-                lineWidth: 2,
+                lineWidth: 1,
                 linecap: 'round',
                 color: "#303cc2",
                 data: data.map((item) => [Number(new Date(item.date)), item.close]), // переводим даты в миллисекунды
