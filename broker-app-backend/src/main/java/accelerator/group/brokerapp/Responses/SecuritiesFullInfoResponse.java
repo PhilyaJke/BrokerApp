@@ -10,8 +10,11 @@ import lombok.Setter;
 public class SecuritiesFullInfoResponse {
 
     private String region;
+    private String figi;
     private Double price;
     private String name;
     private String ticker;
     private String sector;
+    private String icon_path;
+
 }
