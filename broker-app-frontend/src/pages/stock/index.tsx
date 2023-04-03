@@ -23,7 +23,10 @@ const Stock = () => {
             const rawData = await response.json();
             //проблема с тем что дата приходит в формате DD/MM/YYYY и ее нужно правильно спарсить
             const data: PriceDataList = rawData.map((item: any) => ({
-                ...item,
+                low: parseFloat(item.low),
+                high: parseFloat(item.high),
+                close: parseFloat(item.close),
+                open: parseFloat(item.open),
                 date: Date.UTC(
                     parseInt(item.date.split("/")[2]), // year
                     parseInt(item.date.split("/")[1]) - 1, // month (0-indexed)
@@ -31,6 +34,7 @@ const Stock = () => {
                 ),
             }));
             setData(data);
+            console.log(data);
         };
 
         fetchData();
