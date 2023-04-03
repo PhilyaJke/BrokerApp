@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.piapi.contract.v1.MarketDataResponse;
-import ru.tinkoff.piapi.contract.v1.Share;
 import ru.tinkoff.piapi.contract.v1.SubscriptionStatus;
 import ru.tinkoff.piapi.core.stream.StreamProcessor;
 
@@ -79,7 +78,7 @@ public class CheckNewPricesAndTradeableFlag {
         int cpunt = 0;
 
         StreamProcessor<MarketDataResponse> processor = response -> {
-            System.out.println(response.getLastPrice().getPrice());
+            System.out.println(response.getLastPrice().getPrice() + " " + response.getLastPrice().getFigi());
             if (response.hasTradingStatus()) {
                 log.info("Новые данные по статусам: {}", response);
             } else if (response.hasPing()) {

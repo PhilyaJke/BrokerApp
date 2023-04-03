@@ -5,7 +5,7 @@ import {AutoComplete, Button, Card, Radio} from "antd";
 import Search from "antd/es/input/Search";
 import AppLoader from "../../components/appLoader";
 //use redirect
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 
 //плашка для показа что все акции загружены
@@ -45,7 +45,7 @@ const OverviewPage = () => {
     const [page, setPage] = useState(0);
     const [maxPage, setMaxPage] = useState(1);
     const loaderRef = useRef<HTMLDivElement>(null);
-
+    const navigate = useNavigate();
     const handleChangeSearch = (e: any) => {
         console.log(e);
         setSearchValue(e);
@@ -64,9 +64,12 @@ const OverviewPage = () => {
         return searchResult.map((stock) => {
             return {
                 value: stock.ticker,
-                label: (<div style={{display: 'flex', flexDirection: 'column'}}>
-                    <span><code>{stock.ticker}</code></span>
-                    <span><b>{stock.name}</b></span>
+                label: (<div style={{display:'flex', justifyContent:'start', alignItems: 'center', gap: '8px'}} onClick={() => navigate(`/stock/${stock.figi}`)}>
+                    <img style={{width: 32, height: 32}} src={stock.icon_path}/>
+                    <div style={{display: 'flex', flexDirection: 'column'}}>
+                        <span><code>{stock.ticker}</code></span>
+                        <span><b>{stock.name}</b></span>
+                    </div>
                 </div>),
             };
         });
