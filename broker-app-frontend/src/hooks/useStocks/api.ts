@@ -1,6 +1,9 @@
 import {StocksCardProps, StocksPageProps, StocksPageRequest} from './useStocks.model';
 
-const API_URL = 'http://localhost:8080';
+
+import appConfig from "../../../config";
+
+const API_URL = appConfig.URL;
 
 
 export const getStocks = async (props: StocksPageRequest): Promise<StocksPageProps> => {

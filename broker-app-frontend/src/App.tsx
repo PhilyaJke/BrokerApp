@@ -39,6 +39,7 @@ const App = () => {
             <Route path={"/auth"} element={<AuthPage/>}/>
             <Route path={"/register"} element={<RegisterPage/>}/>
             <Route path={"*"} element={<Navigate to={"/"}/>}/>
+            <Route path={'/ping'} element={<p>pong</p>}/>
             {/*<Route path={"*"} element={<h2>404.<br/>Page not exist :-(</h2>}/>*/}
         </Routes>
     )
