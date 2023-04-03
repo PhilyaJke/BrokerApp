@@ -1,16 +1,22 @@
 package accelerator.group.brokerapp.Rest;
 
-import accelerator.group.brokerapp.Entity.Securities;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
 import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
+import com.google.gson.Gson;
 import com.owlike.genson.Genson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.tinkoff.piapi.contract.v1.HistoricCandle;
+import ru.tinkoff.piapi.contract.v1.Quotation;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,6 +67,24 @@ public class SecuritiesRestApi {
         }else{
             return ResponseEntity.notFound().build();
         }
+    }
+
+    //ПЕРЕПИСАТЬ СРОЧНО
+    @GetMapping("/api/securities/list/stock")
+    public ResponseEntity findFullInfo(@RequestParam String figi){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        var s = securitiesService.getSecuritiesInfoFromApi(figi);
+        List<Map<String, String>> list = new ArrayList<>();
+        for(int i = 0; i < s.size(); i++){
+            Map<String, String> map = new HashMap();
+            map.put("high", String.valueOf(Double.valueOf(String.valueOf(s.get(i).getHigh().getUnits()).concat(".").concat(String.valueOf(s.get(i).getHigh().getNano())))));
+            map.put("low", String.valueOf(Double.valueOf(String.valueOf(s.get(i).getLow().getUnits()).concat(".").concat(String.valueOf(s.get(i).getLow().getNano())))));
+            map.put("close", String.valueOf(Double.valueOf(String.valueOf(s.get(i).getClose().getUnits()).concat(".").concat(String.valueOf(s.get(i).getClose().getNano())))));
+            map.put("open", String.valueOf(Double.valueOf(String.valueOf(s.get(i).getOpen().getUnits()).concat(".").concat(String.valueOf(s.get(i).getOpen().getNano())))));
+            map.put("date", simpleDateFormat.format(Date.from(Instant.ofEpochSecond(s.get(i).getTime().getSeconds()))));
+            list.add(map);
+        }
+        return ResponseEntity.ok(list);
     }
 
     public String decodeJson(String json, String key){

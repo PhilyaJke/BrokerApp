@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NamedNativeQueries({
         @NamedNativeQuery(
                 name = "FindFullStocksInfo",
-                query = "SELECT s.region, asi.price, s.name, s.ticker, s.sector" +
+                query = "SELECT s.region, s.figi, asi.price, s.name, s.ticker, s.sector, s.icon_path" +
                         " FROM securities s" +
                         " INNER JOIN additional_stocks_information asi on asi.id = s.additional_info_id",
                 resultSetMapping = "Mapping.SecuritiesFullInfoResponse"
@@ -19,7 +19,7 @@ import javax.persistence.*;
 
         @NamedNativeQuery(
                 name = "FindRUStocksInfo",
-                query = "SELECT s.region, asi.price, s.name, s.ticker, s.sector" +
+                query = "SELECT s.region, s.figi, asi.price, s.name, s.ticker, s.sector, s.icon_path" +
                         " FROM securities s" +
                         " INNER JOIN additional_stocks_information asi on asi.id = s.additional_info_id WHERE s.region = 'RU'",
                 resultSetMapping = "Mapping.SecuritiesFullInfoResponse"
@@ -27,7 +27,7 @@ import javax.persistence.*;
 
         @NamedNativeQuery(
                 name = "FindForeignStocksInfo",
-                query = "SELECT s.region, asi.price, s.name, s.ticker, s.sector" +
+                query = "SELECT s.region, s.figi, asi.price, s.name, s.ticker, s.sector, s.icon_path" +
                         " FROM securities s" +
                         " INNER JOIN additional_stocks_information asi on asi.id = s.additional_info_id WHERE s.region <> 'RU'",
                 resultSetMapping = "Mapping.SecuritiesFullInfoResponse"
@@ -43,10 +43,12 @@ import javax.persistence.*;
         classes = { @ConstructorResult(targetClass = SecuritiesFullInfoResponse.class,
                 columns = {
                         @ColumnResult(name = "region"),
+                        @ColumnResult(name = "figi"),
                         @ColumnResult(name = "price"),
                         @ColumnResult(name = "name"),
                         @ColumnResult(name = "ticker"),
                         @ColumnResult(name = "sector"),
+                        @ColumnResult(name = "icon_path")
                 })
         }
 )
@@ -79,6 +81,9 @@ public class Securities {
 
     @Column(name = "sector")
     private String Sector;
+
+    @Column(name = "icon_path")
+    private String iconPath;
 
     @OneToOne
     @MapsId

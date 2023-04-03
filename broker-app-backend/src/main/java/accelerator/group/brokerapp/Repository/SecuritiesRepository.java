@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SecuritiesRepository extends JpaRepository<Securities, Long> {
@@ -44,6 +45,15 @@ public interface SecuritiesRepository extends JpaRepository<Securities, Long> {
             name = "FindFullStocksInfo",
             countName = "CountSecurities")
     List<SecuritiesFullInfoResponse> findAllSecuritiesPage(Pageable pageable);
+
+
+
+
+    @Query(value = "SELECT s FROM Securities s WHERE s.Ticker = ?1")
+    Optional<Securities> findByTicker(@Param(value = "ticker") String ticker);
+
+    @Query(value = "SELECT s FROM Securities s WHERE s.iconPath = 'null'")
+    List<Securities> findSecuritiesWhereIconPathNull();
 
 
 }
