@@ -1,7 +1,6 @@
 import {AuthRes, LoginReq, RefreshAccessTokenRes, RegisterReq} from "./models";
 
 import appConfig from "../../../config";
-
 const API_URL = appConfig.URL;
 
 export async function login(req: LoginReq): Promise<AuthRes> {
