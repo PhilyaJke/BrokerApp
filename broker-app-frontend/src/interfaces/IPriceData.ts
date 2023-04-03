@@ -1,5 +1,5 @@
 export interface IPriceData {
-    date: string;
+    date: Date;
     low: number;
     high: number;
     close: number;

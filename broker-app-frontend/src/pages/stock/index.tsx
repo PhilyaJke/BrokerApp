@@ -12,7 +12,7 @@ const API_URL = appConfig.URL;
 const Stock = () => {
     const {figi} = useParams<{ figi: string }>();
     const [data, setData] = useState<PriceDataList | null>(null);
-
+    //data have format dd/mm/yyyy convert to new Date
     async function fetchData() {
         const response = await fetch(`${API_URL}/api/securities/list/stock/?figi=${figi}`, {
             method: 'GET',
@@ -45,9 +45,9 @@ const Stock = () => {
     return (
         <LineChart width={800} height={400} data={data} margin={{top: 20, right: 30, left: 20, bottom: 5}}>
             <CartesianGrid strokeDasharray="3 3"/>
-            <XAxis dataKey="date" tickFormatter={(dateStr) => format(new Date(dateStr), 'dd.MM.yyyy')}/>
+            <XAxis dataKey="date"/>
             <YAxis/>
-            <Tooltip labelFormatter={(dateStr) => format(new Date(dateStr), 'dd.MM.yyyy')}/>
+            <Tooltip/>
             <Legend/>
             <Line type="basis" dataKey="close" stroke="#8884d8" activeDot={{r: 8}}/>
         </LineChart>
