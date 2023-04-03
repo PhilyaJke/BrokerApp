@@ -20,11 +20,11 @@ const EndOfStocks = () => {
 };
 
 
-const StocksCard = memo(({ticker, name, region, sector, price, icon_path, figi}: StocksCardProps) => {
+const StocksCard = memo(({ticker, name, region, sector, price, icon_path}: StocksCardProps) => {
     const navigate = useNavigate();
     return (
-        <Card title={ticker} style={{width: 300}} key={figi} onClick={() => navigate(`/stock/${figi}`)}>
-            <img src={icon_path} alt={figi} style={{width: 50, height: 50}}/>
+        <Card title={ticker} style={{width: 300}} onClick={() => navigate(`/quote/${ticker}`)}>
+            <img src={icon_path} style={{width: 50, height: 50}} alt={''}/>
             <p><b>{name}</b></p>
             <p>{region}</p>
             <p>{sector}</p>
@@ -64,7 +64,7 @@ const OverviewPage = () => {
         return searchResult.map((stock) => {
             return {
                 value: stock.ticker,
-                label: (<div style={{display:'flex', justifyContent:'start', alignItems: 'center', gap: '8px'}} onClick={() => navigate(`/stock/${stock.figi}`)}>
+                label: (<div style={{display:'flex', justifyContent:'start', alignItems: 'center', gap: '8px'}} onClick={() => navigate(`/quote/${stock.ticker}`)}>
                     <img style={{width: 32, height: 32}} src={stock.icon_path}/>
                     <div style={{display: 'flex', flexDirection: 'column'}}>
                         <span><code>{stock.ticker}</code></span>

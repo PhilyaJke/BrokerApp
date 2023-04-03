@@ -10,11 +10,11 @@ const API_URL = appConfig.URL;
 
 
 const Stock = () => {
-    const {figi} = useParams<{ figi: string }>();
+    const {ticker} = useParams<{ ticker: string }>();
     const [data, setData] = useState<PriceDataList | null>(null);
     //data have format dd/mm/yyyy convert to new Date
     async function fetchData() {
-        const response = await fetch(`${API_URL}/api/securities/list/stock/?figi=${figi}`, {
+        const response = await fetch(`${API_URL}/api/securities/list/stock/?ticker=${ticker}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ const Stock = () => {
 
     useEffect(() => {
         fetchData();
-    }, [figi]);
+    }, [ticker]);
 
     //on start
 

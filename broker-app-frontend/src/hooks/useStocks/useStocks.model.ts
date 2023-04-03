@@ -4,7 +4,6 @@ export interface StocksCardProps {
     sector: string;
     ticker: string;
     price: number;
-    figi: string;
     icon_path: string;
 }
 
@@ -21,3 +20,4 @@ export interface StocksPageProps {
     // "currentPage": number;
     // "totalPages": number;
 }
+
