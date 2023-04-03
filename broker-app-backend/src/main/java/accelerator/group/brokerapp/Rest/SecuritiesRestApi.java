@@ -71,9 +71,10 @@ public class SecuritiesRestApi {
 
     //ПЕРЕПИСАТЬ СРОЧНО
     @GetMapping("/api/securities/list/stock")
-    public ResponseEntity findFullInfo(@RequestParam String figi){
+    public ResponseEntity findFullInfo(@RequestParam String ticker){
+        System.out.println(ticker);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        var s = securitiesService.getSecuritiesInfoFromApi(figi);
+        var s = securitiesService.getSecuritiesInfoFromApi(securitiesRepository.findByTicker(ticker).get().getFigi());
         List<Map<String, String>> list = new ArrayList<>();
         for(int i = 0; i < s.size(); i++){
             Map<String, String> map = new HashMap();
