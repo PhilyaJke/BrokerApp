@@ -2,7 +2,6 @@ package accelerator.group.brokerapp.Repository;
 
 import accelerator.group.brokerapp.Entity.Securities;
 import accelerator.group.brokerapp.Responses.SecuritiesFullInfoResponse;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,11 +21,7 @@ public interface SecuritiesRepository extends JpaRepository<Securities, Long> {
     Securities findSecurityByFigi(@Param(value = "figi") String figi);
 
     @Query(value = "SELECT s.Figi FROM Securities s")
-    Page<String> findLimitedSecurities(Pageable pageable);
-
-//    @Modifying
-//    @Query(name = "GetAllStocksInfoForSearch", nativeQuery = true)
-//    List<StocksResponse> findAlll();
+    List<String> findLimitedSecurities(Pageable pageable);
 
     @Query(
             nativeQuery = true,
@@ -47,10 +42,11 @@ public interface SecuritiesRepository extends JpaRepository<Securities, Long> {
     List<SecuritiesFullInfoResponse> findAllSecuritiesPage(Pageable pageable);
 
 
-
-
     @Query(value = "SELECT s FROM Securities s WHERE s.Ticker = ?1")
     Optional<Securities> findByTicker(@Param(value = "ticker") String ticker);
+
+    @Query(value = "SELECT s.Figi FROM Securities s WHERE s.Ticker = ?1")
+    Optional<String> findFigiByTicker(@Param(value = "ticker") String ticker);
 
     @Query(value = "SELECT s FROM Securities s WHERE s.iconPath = 'null'")
     List<Securities> findSecuritiesWhereIconPathNull();

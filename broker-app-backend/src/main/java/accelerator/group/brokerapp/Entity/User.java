@@ -10,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-
 @Entity
 @Table(name = "users")
 @Data

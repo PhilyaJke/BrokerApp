@@ -11,14 +11,8 @@ import ru.tinkoff.piapi.contract.v1.CandleInterval;
 import ru.tinkoff.piapi.contract.v1.HistoricCandle;
 import ru.tinkoff.piapi.core.InvestApi;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.Year;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 @Service
 public class SecuritiesServiceImpl implements SecuritiesService{

@@ -1,22 +1,26 @@
 package accelerator.group.brokerapp.Rest;
 
+import accelerator.group.brokerapp.Entity.LastPriceOfSecurities;
+import accelerator.group.brokerapp.Repository.LastPriceOfSecuritiesRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
 import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
-import com.google.gson.Gson;
+import accelerator.group.brokerapp.TinkoffInvestApi.CacheableLastPrices;
+import accelerator.group.brokerapp.WebSockets.WSHandler;
 import com.owlike.genson.Genson;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.tinkoff.piapi.contract.v1.HistoricCandle;
-import ru.tinkoff.piapi.contract.v1.Quotation;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
+import java.net.URI;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,13 +29,19 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:5173")
 public class SecuritiesRestApi {
 
+    private final WSHandler WSHandler;
     private final SecuritiesServiceImpl securitiesService;
     private final SecuritiesRepository securitiesRepository;
+    private final CacheableLastPrices cacheableLastPrices;
+    private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
 
     @Autowired
-    public SecuritiesRestApi(SecuritiesServiceImpl securitiesService, SecuritiesRepository securitiesRepository) {
+    public SecuritiesRestApi(WSHandler WSHandler, SecuritiesServiceImpl securitiesService, SecuritiesRepository securitiesRepository, CacheableLastPrices cacheableLastPrices, LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository) {
+        this.WSHandler = WSHandler;
         this.securitiesService = securitiesService;
         this.securitiesRepository = securitiesRepository;
+        this.cacheableLastPrices = cacheableLastPrices;
+        this.lastPriceOfSecuritiesRepository = lastPriceOfSecuritiesRepository;
     }
 
     @GetMapping("/api/securities/list/securities")
@@ -69,23 +79,53 @@ public class SecuritiesRestApi {
         }
     }
 
-    //ПЕРЕПИСАТЬ СРОЧНО
     @GetMapping("/api/securities/list/stock")
     public ResponseEntity findFullInfo(@RequestParam String ticker){
         System.out.println(ticker);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         var s = securitiesService.getSecuritiesInfoFromApi(securitiesRepository.findByTicker(ticker).get().getFigi());
-        List<Map<String, String>> list = new ArrayList<>();
+        List<Map<String, Object>> list = new ArrayList<>();
         for(int i = 0; i < s.size(); i++){
-            Map<String, String> map = new HashMap();
-            map.put("high", String.valueOf(Double.valueOf(String.valueOf(s.get(i).getHigh().getUnits()).concat(".").concat(String.valueOf(s.get(i).getHigh().getNano())))));
-            map.put("low", String.valueOf(Double.valueOf(String.valueOf(s.get(i).getLow().getUnits()).concat(".").concat(String.valueOf(s.get(i).getLow().getNano())))));
-            map.put("close", String.valueOf(Double.valueOf(String.valueOf(s.get(i).getClose().getUnits()).concat(".").concat(String.valueOf(s.get(i).getClose().getNano())))));
-            map.put("open", String.valueOf(Double.valueOf(String.valueOf(s.get(i).getOpen().getUnits()).concat(".").concat(String.valueOf(s.get(i).getOpen().getNano())))));
+            parseToDoublePrice(s.get(i).getHigh().getUnits(), s.get(i).getHigh().getNano() );
+            Map<String, Object> map = new HashMap();
+            map.put("high", parseToDoublePrice(s.get(i).getHigh().getUnits(), s.get(i).getHigh().getNano()));
+            map.put("low", parseToDoublePrice(s.get(i).getLow().getUnits(), s.get(i).getLow().getNano()));
+            map.put("close", parseToDoublePrice(s.get(i).getClose().getUnits(), s.get(i).getClose().getNano()));
+            map.put("open", parseToDoublePrice(s.get(i).getOpen().getUnits(), s.get(i).getOpen().getNano()));
             map.put("date", simpleDateFormat.format(Date.from(Instant.ofEpochSecond(s.get(i).getTime().getSeconds()))));
             list.add(map);
         }
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/getprice")
+    public void getPrice() throws IOException, InterruptedException {
+       Map<WebSocketSession, URI> map = WSHandler.getClients();
+       while (true) {
+           for (int i = 0; i < map.size(); i++) {
+               var ticker = Arrays.stream(map.get(i).getPath().split("/")).collect(Collectors.toList()).get(2);
+               var figi = securitiesRepository.findFigiByTicker(ticker);
+               if (figi.isPresent()) {
+                   Optional<LastPriceOfSecurities> optionalLastPriceOfSecurities = lastPriceOfSecuritiesRepository.findById(figi.get());
+                   if (optionalLastPriceOfSecurities.isPresent()) {
+                       Double productAsString = optionalLastPriceOfSecurities.get().getPrice();
+                       Timestamp timestamp = new java.sql.Timestamp(System.currentTimeMillis());
+                       JSONObject jsonObject = new JSONObject();
+                       jsonObject.append("price", productAsString);
+                       jsonObject.append("date", timestamp);
+                       map.keySet().stream().collect(Collectors.toList()).get(i).sendMessage(new TextMessage(jsonObject.toString()));
+                   } else {
+                       map.keySet().stream().collect(Collectors.toList()).get(i).sendMessage(new TextMessage("хуй"));
+                   }
+               }
+           }
+       }
+    }
+
+    public Double parseToDoublePrice(long units, int nano) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(units).append(nano).insert(String.valueOf(units).length(), ".");
+        return Double.valueOf(String.valueOf(stringBuilder));
     }
 
     public String decodeJson(String json, String key){
