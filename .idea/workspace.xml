@@ -10,26 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f161ab6c-c43a-4dde-ba0d-f42b6988400b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/BrokerApp.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jpa-buddy.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries-with-intellij-classes.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Configuration/WebSecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Configuration/WebSecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Entity/AdditionalStocksInformation.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Entity/AdditionalStocksInformation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Entity/Securities.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Entity/Securities.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Repository/AdditionalStocksInformationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Repository/AdditionalStocksInformationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Rest/UserRestApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Rest/UserRestApi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/TinkoffInvestApi/CheckNewPricesAndTradeableFlag.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/TinkoffInvestApi/CheckNewPricesAndTradeableFlag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/WebSockets/WSHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/WebSockets/WSHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/Dockerfile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -340,7 +322,7 @@
       <workItem from="1681203399402" duration="2829000" />
       <workItem from="1681223239715" duration="1214000" />
       <workItem from="1681224492215" duration="965000" />
-      <workItem from="1681225503398" duration="7071000" />
+      <workItem from="1681225503398" duration="8125000" />
     </task>
     <servers />
   </component>
