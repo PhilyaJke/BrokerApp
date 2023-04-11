@@ -61,7 +61,12 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
                     jsonObject.append("date", timestamp);
                     session.sendMessage(new TextMessage(jsonObject.toString()));
                 } else {
-                    session.sendMessage(new TextMessage(""));
+                    Double price = securitiesRepository.findSecurityByFigi(figi).getAdditionalStocksInformation().getPrice();
+                    Timestamp timestamp = new java.sql.Timestamp(System.currentTimeMillis());
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.append("price", price);
+                    jsonObject.append("date", timestamp);
+                    session.sendMessage(new TextMessage(jsonObject.toString()));
                 }
             }
 
