@@ -98,30 +98,6 @@ public class SecuritiesRestApi {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/getprice")
-    public void getPrice() throws IOException, InterruptedException {
-       Map<WebSocketSession, URI> map = WSHandler.getClients();
-       while (true) {
-           for (int i = 0; i < map.size(); i++) {
-               var ticker = Arrays.stream(map.get(i).getPath().split("/")).collect(Collectors.toList()).get(2);
-               var figi = securitiesRepository.findFigiByTicker(ticker);
-               if (figi.isPresent()) {
-                   Optional<LastPriceOfSecurities> optionalLastPriceOfSecurities = lastPriceOfSecuritiesRepository.findById(figi.get());
-                   if (optionalLastPriceOfSecurities.isPresent()) {
-                       Double productAsString = optionalLastPriceOfSecurities.get().getPrice();
-                       Timestamp timestamp = new java.sql.Timestamp(System.currentTimeMillis());
-                       JSONObject jsonObject = new JSONObject();
-                       jsonObject.append("price", productAsString);
-                       jsonObject.append("date", timestamp);
-                       map.keySet().stream().collect(Collectors.toList()).get(i).sendMessage(new TextMessage(jsonObject.toString()));
-                   } else {
-                       map.keySet().stream().collect(Collectors.toList()).get(i).sendMessage(new TextMessage("хуй"));
-                   }
-               }
-           }
-       }
-    }
-
     public Double parseToDoublePrice(long units, int nano) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(units).append(nano).insert(String.valueOf(units).length(), ".");

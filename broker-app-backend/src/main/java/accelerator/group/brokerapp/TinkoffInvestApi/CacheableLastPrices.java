@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 
 @Slf4j
 @Component
-@EnableScheduling
 public class CacheableLastPrices{
 
     private final SecuritiesRepository securitiesRepository;

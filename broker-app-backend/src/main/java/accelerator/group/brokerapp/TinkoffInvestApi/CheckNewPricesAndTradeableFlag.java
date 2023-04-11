@@ -42,32 +42,32 @@ public class CheckNewPricesAndTradeableFlag{
     }
 
 
-//    @Async
-//    @Scheduled(fixedDelay = 1200000)
-//    @Transactional
-//    protected void updateLastPricesAndGetTradeableFlag() {
-//        log.info("Проверка цен акций");
-//        for (int i = 0; i < 8; i += 1) {
-//            var securities = securitiesRepository.findLimitedSecurities(PageRequest.of(i, 299));
-//            var lastprices = securitiesService.returnInvestApiConnection().getMarketDataService().getLastPricesSync(securities);
-//            for(int j = 0; j < lastprices.size(); j++){
-//                if(lastprices.get(j).getFigi().isEmpty()){
-//                    continue;
-//                }else{
-//                    for (int k = 0; k < securities.size(); k++) {
-//                        if (!securitiesRepository.findSecurityByFigi(lastprices.get(j).getFigi()).equals(null)) {
-//                            var sec = securitiesRepository.findSecurityByFigi(lastprices.get(j).getFigi()).getAdditionalStocksInformation();
-//                            sec.setPrice(Double.valueOf(String.valueOf(lastprices.get(j).getPrice().getUnits()).concat(".")
-//                                    .concat(String.valueOf(lastprices.get(j).getPrice().getNano()))));
-//                            additionalStocksInformationRepository.save(sec);
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    log.info("Конец проверки цен акций");
-//}
+    @Async
+    @Scheduled(fixedDelay = 1200000)
+    @Transactional
+    protected void updateLastPricesAndGetTradeableFlag() {
+        log.info("Проверка цен акций");
+        for (int i = 0; i < 8; i += 1) {
+            var securities = securitiesRepository.findLimitedSecurities(PageRequest.of(i, 299));
+            var lastprices = securitiesService.returnInvestApiConnection().getMarketDataService().getLastPricesSync(securities);
+            for(int j = 0; j < lastprices.size(); j++){
+                if(lastprices.get(j).getFigi().isEmpty()){
+                    continue;
+                }else{
+                    for (int k = 0; k < securities.size(); k++) {
+                        if (!securitiesRepository.findSecurityByFigi(lastprices.get(j).getFigi()).equals(null)) {
+                            var sec = securitiesRepository.findSecurityByFigi(lastprices.get(j).getFigi()).getAdditionalStocksInformation();
+                            sec.setPrice(Double.valueOf(String.valueOf(lastprices.get(j).getPrice().getUnits()).concat(".")
+                                    .concat(String.valueOf(lastprices.get(j).getPrice().getNano()))));
+                            additionalStocksInformationRepository.save(sec);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    log.info("Конец проверки цен акций");
+}
 
 
 //Обновить и сделать автоматическое добавление иконок

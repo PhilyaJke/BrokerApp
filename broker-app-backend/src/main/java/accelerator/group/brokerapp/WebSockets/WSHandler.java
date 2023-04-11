@@ -3,27 +3,28 @@ package accelerator.group.brokerapp.WebSockets;
 import accelerator.group.brokerapp.Entity.LastPriceOfSecurities;
 import accelerator.group.brokerapp.Repository.LastPriceOfSecuritiesRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.amazonaws.services.ec2.model.PtrUpdateStatus;
+import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.dynamic.DynamicType;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.core.MessagePostProcessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.net.URI;
-import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
 //  @EventListener
 
+@Slf4j
 @Component
 public class WSHandler extends TextWebSocketHandler implements WebSocketHandler {
 
-    private Map<WebSocketSession, URI> clients = new HashMap<>();
+    private Set<URI> uriSet = new HashSet<>();
 
     private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
     private final SecuritiesRepository securitiesRepository;
@@ -36,31 +37,41 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        if(!clients.containsValue(session.getUri()) && clients.size() != 0){
-            clients.put(session, session.getUri());
-        }else{
-            session.close();
-        }
-        while(true){
-            for (int i = 0; i < clients.size(); i++) {
-                var ticker = Arrays.stream(clients.get(i).getPath().split("/")).collect(Collectors.toList()).get(2);
-                var figi = securitiesRepository.findFigiByTicker(ticker);
-                if (figi.isPresent()) {
-                    Optional<LastPriceOfSecurities> optionalLastPriceOfSecurities = lastPriceOfSecuritiesRepository.findById(figi.get());
-                    if (optionalLastPriceOfSecurities.isPresent()) {
-                        Double productAsString = optionalLastPriceOfSecurities.get().getPrice();
-                        Timestamp timestamp = new java.sql.Timestamp(System.currentTimeMillis());
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.append("price", productAsString);
-                        jsonObject.append("date", timestamp);
-                        clients.keySet().stream().collect(Collectors.toList()).get(i).sendMessage(new TextMessage(jsonObject.toString()));
-                    } else {
-                        clients.keySet().stream().collect(Collectors.toList()).get(i).sendMessage(new TextMessage("хуй"));
-                    }
+
+        try {
+            String figi = "";
+
+            log.info("Запрос на соединение с uri: {}", session.getUri());
+
+            if (!uriSet.contains(session.getUri())) {
+                uriSet.add(session.getUri());
+                String ticker = Arrays.stream(session.getUri().getPath().split("/")).collect(Collectors.toList()).get(2);
+                figi = securitiesRepository.findFigiByTicker(ticker).get();
+            } else {
+                session.close();
+            }
+
+            while (true) {
+                Optional<LastPriceOfSecurities> optionalLastPriceOfSecurities = lastPriceOfSecuritiesRepository.findById(figi);
+                if (optionalLastPriceOfSecurities.isPresent()) {
+                    Double productAsString = optionalLastPriceOfSecurities.get().getPrice();
+                    Timestamp timestamp = new java.sql.Timestamp(System.currentTimeMillis());
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.append("price", productAsString);
+                    jsonObject.append("date", timestamp);
+                    session.sendMessage(new TextMessage(jsonObject.toString()));
+                } else {
+                    session.sendMessage(new TextMessage("хуй"));
                 }
             }
-        }
+
+        }catch (IOException | IllegalStateException exc){
+            log.info("Разрыв соединения с uri: {}", session.getUri());
+            uriSet.remove(session.getUri());
+            session.close();
     }
+}
+
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -70,13 +81,11 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
-    }
-
-    public Map<WebSocketSession, URI> getClients() {
-        return clients;
-    }
-
-    public void setClients(Map<WebSocketSession, URI> clients) {
-        this.clients = clients;
+        try {
+            uriSet.remove(session.getUri());
+            session.close();
+        }catch (IOException exc){
+            log.info("Разрыв соединения с uri: {}", session.getUri());
+        }
     }
 }
