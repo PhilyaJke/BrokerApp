@@ -70,14 +70,19 @@ public class UserRestApi {
         String AccessToken = "";
         String RefreshToken = "";
         try {
+            log.info("Запрос на логин пришел от пользователя 1 - {}", authenticationRequest.getEmail());
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getUsername(), authenticationRequest.getPassword()));
+            log.info("Запрос на логин пришел от пользователя 2 - {}", authenticationRequest.getEmail());
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("Запрос на логин пришел от пользователя 3 - {}", authenticationRequest.getEmail());
             AccessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().name());
             RefreshToken = jwtTokenProvider.createRefreshToken(user.getUsername(), user.getRole().name());
+            log.info("Запрос на логин пришел от пользователя 4 - {}", authenticationRequest.getEmail());
             if(refreshTokensRepository.FindRefreshTokenByUserUUID(userRepository.findByUsername(user.getUsername()).get().getId())!=null){
                 refreshTokensRepository.deleteRefreshTokensByUserUUID(userRepository.findByUsername(user.getUsername()).get().getId());
             }
+            log.info("Запрос на логин пришел от пользователя 5 - {}", authenticationRequest.getEmail());
             RefreshTokens refreshTokens = new RefreshTokens();
             refreshTokens.setToken(RefreshToken);
             refreshTokens.setUserUUID(user.getId());
@@ -103,7 +108,8 @@ public class UserRestApi {
         if(userRepository.findByEmail(registrationRequest.getEmail()).isPresent()){
             return new ResponseEntity("User already exist", HttpStatus.FORBIDDEN);
         }else{
-            User user = new User(registrationRequest.getUsername(), registrationRequest.getPassword(),
+            //Возможно тут подлянка
+            User user = new User(registrationRequest.getUsername(), passwordEncoder().encode(registrationRequest.getPassword()),
                     null, registrationRequest.getEmail(),
                     Role.USER, Status.ACTIVE);
             userService.saveUser(user);

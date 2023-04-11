@@ -85,8 +85,8 @@ public class Securities {
     @Column(name = "icon_path")
     private String iconPath;
 
-    @OneToOne
     @MapsId
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "additional_info_id")
     private AdditionalStocksInformation additionalStocksInformation;
 

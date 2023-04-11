@@ -61,7 +61,7 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
                     jsonObject.append("date", timestamp);
                     session.sendMessage(new TextMessage(jsonObject.toString()));
                 } else {
-                    session.sendMessage(new TextMessage("хуй"));
+                    session.sendMessage(new TextMessage(""));
                 }
             }
 

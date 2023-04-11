@@ -33,7 +33,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers( "/").permitAll()
                 .antMatchers( "/api/auth/**", "/api/securities/list/**", "/price", "/price/{ticker}", "/getprice", "/getprice/{address}").permitAll()
                 .antMatchers("/api/auth/logout", "/api/auth/updateaccesstoken").authenticated()
                 .anyRequest().authenticated()

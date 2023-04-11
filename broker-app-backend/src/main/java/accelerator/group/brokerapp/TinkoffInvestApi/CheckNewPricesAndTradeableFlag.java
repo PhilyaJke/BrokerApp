@@ -43,8 +43,7 @@ public class CheckNewPricesAndTradeableFlag{
 
 
     @Async
-    @Scheduled(fixedDelay = 1200000)
-    @Transactional
+    @Scheduled(fixedDelay = 2000000)
     protected void updateLastPricesAndGetTradeableFlag() {
         log.info("Проверка цен акций");
         for (int i = 0; i < 8; i += 1) {
@@ -84,7 +83,6 @@ public class CheckNewPricesAndTradeableFlag{
                     AdditionalStocksInformation additionalStocksInformation = new AdditionalStocksInformation(
                             shares.get(i).getLot()
                     );
-                    additionalStocksInformationRepository.save(additionalStocksInformation);
 
                     Securities securities = new Securities(
                             shares.get(i).getFigi(),
@@ -94,7 +92,9 @@ public class CheckNewPricesAndTradeableFlag{
                             shares.get(i).getSector(),
                             additionalStocksInformation
                     );
+
                     securitiesRepository.save(securities);
+                    additionalStocksInformationRepository.save(additionalStocksInformation);
                 }
             }
         }catch (ApiRuntimeException exc){

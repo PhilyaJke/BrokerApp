@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  postgres:
+    image: 'postgres:10'
+    restart: always
+    container_name: 'java-postgres'
+    environment:
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_HOST_AUTH_METHOD=trust'
+      - 'POSTGRES_DB=brokerapp'
+    ports:
+    - 5432:5432
+
+  redis:
+    image: 'redis:5.0.5'
+    container_name: 'java-redis'
+    restart: 'unless-stopped'
+    hostname: redis
+    ports:
+    - 6379:6379/tcp
+
+  server:
+    build:
+      dockerfile: Dockerfile
+    container_name: 'java-app'
+    ports:
+    - 8080:8080
