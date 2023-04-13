@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {getStocks, searchStocksForSuggestion, getRealtimeStockPrice} from "./api";
+import {getRealtimeStockPrice, getStocks, searchStocksForSuggestion} from "./api";
 import {StocksCardProps, StocksPageProps, StocksPageRequest} from "./useStocks.model";
 
 
@@ -38,21 +38,16 @@ const useStocks = () => {
         }
     }
 
-    const handleRealtimePrice = (ticker: string)=> {
-        const [realtimePrice, setRealtimePrice] = useState<number | null>(null);
+    const handleRealtimePrice = (ticker: string, callback: (price: number) => void): () => void => {
 
         const ws = getRealtimeStockPrice(ticker, (price: number) => {
-            setRealtimePrice(price);
+            callback(price);
         });
 
-        const close = () => {
+        return () => {
             ws.close();
-        }
+        };
 
-        return {
-            realtimePrice,
-            close
-        }
     }
     return {
         isLoading,
