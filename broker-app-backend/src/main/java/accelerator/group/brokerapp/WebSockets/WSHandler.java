@@ -38,6 +38,7 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
         Double actualPrice = 0.0;
 
         try {
+
             String figi = "";
 
             log.info("Запрос на соединение с uri: {}", session.getUri());
@@ -50,7 +51,7 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
                 session.close();
             }
 
-            while (true) {
+            while (session.isOpen()) {
                 Optional<LastPriceOfSecurities> optionalLastPriceOfSecurities = lastPriceOfSecuritiesRepository.findById(figi);
                 if (optionalLastPriceOfSecurities.isPresent()) {
                     Double productAsString = optionalLastPriceOfSecurities.get().getPrice();
@@ -70,13 +71,13 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
                     }
                 }
             }
-
         }catch (IOException | IllegalStateException exc){
             log.info("Разрыв соединения с uri: {}", session.getUri());
             uriSet.remove(session.getUri());
             session.close();
     }
 }
+
 
 
     @Override
