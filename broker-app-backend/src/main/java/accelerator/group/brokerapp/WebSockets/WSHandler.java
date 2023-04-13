@@ -3,9 +3,7 @@ package accelerator.group.brokerapp.WebSockets;
 import accelerator.group.brokerapp.Entity.LastPriceOfSecurities;
 import accelerator.group.brokerapp.Repository.LastPriceOfSecuritiesRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
-import com.amazonaws.services.ec2.model.PtrUpdateStatus;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.dynamic.DynamicType;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +12,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.net.URI;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +35,8 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
+        Double actualPrice = 0.0;
+
         try {
             String figi = "";
 
@@ -55,18 +54,20 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
                 Optional<LastPriceOfSecurities> optionalLastPriceOfSecurities = lastPriceOfSecuritiesRepository.findById(figi);
                 if (optionalLastPriceOfSecurities.isPresent()) {
                     Double productAsString = optionalLastPriceOfSecurities.get().getPrice();
-                    Timestamp timestamp = new java.sql.Timestamp(System.currentTimeMillis());
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.append("price", productAsString);
-                    jsonObject.append("date", timestamp);
-                    session.sendMessage(new TextMessage(jsonObject.toString()));
+                    if(!productAsString.equals(actualPrice)){
+                        actualPrice = productAsString;
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.append("price", productAsString);
+                        session.sendMessage(new TextMessage(jsonObject.toString()));
+                    }
                 } else {
                     Double price = securitiesRepository.findSecurityByFigi(figi).getAdditionalStocksInformation().getPrice();
-                    Timestamp timestamp = new java.sql.Timestamp(System.currentTimeMillis());
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.append("price", price);
-                    jsonObject.append("date", timestamp);
-                    session.sendMessage(new TextMessage(jsonObject.toString()));
+                    if(!price.equals(actualPrice)){
+                        actualPrice = price;
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.append("price", price);
+                        session.sendMessage(new TextMessage(jsonObject.toString()));
+                    }
                 }
             }
 
