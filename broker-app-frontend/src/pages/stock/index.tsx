@@ -1,44 +1,70 @@
-import { useEffect, useState } from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import { useParams } from "react-router-dom";
 import { PriceDataList } from "../../interfaces/IPriceData";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import appConfig from "../../../config";
+import useStocks from "../../hooks/useStocks/useStocks";
+import React from "react";
 const API_URL = appConfig.URL;
+
+
+const getGraphData = async (ticker: string) => {
+    const fetchData = async () => {
+        const response = await fetch(
+            `${API_URL}/api/securities/list/stock/?ticker=${ticker}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        ).catch((error) => {
+                console.log(error);
+            }
+        );
+        if (!response) {
+            return null;
+        }
+        const rawData = await response.json();
+        //проблема с тем что дата приходит в формате DD/MM/YYYY и ее нужно правильно спарсить
+        const data: PriceDataList = rawData.map((item: any) => ({
+            low: parseFloat(item.low),
+            high: parseFloat(item.high),
+            close: parseFloat(item.close),
+            open: parseFloat(item.open),
+            date: Date.UTC(
+                parseInt(item.date.split("/")[2]), // year
+                parseInt(item.date.split("/")[1]) - 1, // month (0-indexed)
+                parseInt(item.date.split("/")[0]) // day
+            ),
+        }));
+        return data;
+    }
+    return await fetchData();
+}
 
 const Stock = () => {
     const { ticker } = useParams<{ ticker: string }>();
     const [data, setData] = useState<PriceDataList | null>(null);
+    const {handleRealtimePrice} = useStocks();
+    const [realtimePrice, setRealtimePrice] = useState<number>(0);
+    if (!ticker) {
+        return <div>Тикер не указан</div>;
+    }
     useEffect(() => {
-        const fetchData = async () => {
-            const response = await fetch(
-                `${API_URL}/api/securities/list/stock/?ticker=${ticker}`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-            const rawData = await response.json();
-            //проблема с тем что дата приходит в формате DD/MM/YYYY и ее нужно правильно спарсить
-            const data: PriceDataList = rawData.map((item: any) => ({
-                low: parseFloat(item.low),
-                high: parseFloat(item.high),
-                close: parseFloat(item.close),
-                open: parseFloat(item.open),
-                date: Date.UTC(
-                    parseInt(item.date.split("/")[2]), // year
-                    parseInt(item.date.split("/")[1]) - 1, // month (0-indexed)
-                    parseInt(item.date.split("/")[0]) // day
-                ),
-            }));
-            setData(data);
-            console.log(data);
-        };
-
-        fetchData();
-    }, [ticker]);
+        getGraphData(ticker).then((data) => {
+            setData(data)
+        }
+        )
+        const close = handleRealtimePrice(ticker, price => {
+            setRealtimePrice(price);
+        });
+        return () => {
+            console.log('WS CLOSED');
+            close();
+        }
+    }, []);
 
     if (!data) {
         return <div>Loading...</div>;
@@ -109,6 +135,8 @@ const Stock = () => {
 
     return (
         <div>
+            <h1>{ticker}</h1>
+            <p>Цена: {realtimePrice}</p>
             <HighchartsReact highcharts={Highcharts} options={options} />
         </div>
     );

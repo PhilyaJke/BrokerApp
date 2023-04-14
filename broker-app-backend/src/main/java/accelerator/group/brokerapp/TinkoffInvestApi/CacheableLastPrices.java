@@ -7,7 +7,6 @@ import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceIm
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 import ru.tinkoff.piapi.contract.v1.MarketDataResponse;
 import ru.tinkoff.piapi.contract.v1.SubscriptionStatus;
@@ -15,8 +14,6 @@ import ru.tinkoff.piapi.core.exception.ApiRuntimeException;
 import ru.tinkoff.piapi.core.stream.StreamProcessor;
 
 import javax.annotation.PostConstruct;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -36,7 +33,7 @@ public class CacheableLastPrices{
 
     @Cacheable(value = "LastPrice")
     @PostConstruct
-    public void SecuritiesStreamInfo() throws InterruptedException {
+    public void SecuritiesStreamInfo(){
         try {
             StreamProcessor<MarketDataResponse> processor = response -> {
                 if (response.hasTradingStatus()) {
@@ -80,7 +77,7 @@ public class CacheableLastPrices{
                     log.info("неудачных подписок на последние цены: {}", errorCount);
                 }
             };
-            Consumer<Throwable> onErrorCallback = error -> error.printStackTrace();
+            Consumer<Throwable> onErrorCallback = Throwable::printStackTrace;
 
             securitiesService.returnInvestApiConnection().getMarketDataStreamService().newStream("info_stream", processor, onErrorCallback).subscribeLastPrices(securitiesRepository.findLimitedSecurities(PageRequest.of(1, 299)));
 

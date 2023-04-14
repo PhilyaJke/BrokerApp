@@ -11,17 +11,14 @@ import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
-
-//  @EventListener
 
 @Slf4j
 @Component
 public class WSHandler extends TextWebSocketHandler implements WebSocketHandler {
 
-    private Set<URI> uriSet = new HashSet<>();
+    private final Set<WebSocketSession> uriSet = new HashSet<>();
 
     private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
     private final SecuritiesRepository securitiesRepository;
@@ -39,16 +36,20 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
 
         try {
 
-            String figi = "";
+            String figi;
 
             log.info("Запрос на соединение с uri: {}", session.getUri());
 
-            if (!uriSet.contains(session.getUri())) {
-                uriSet.add(session.getUri());
-                String ticker = Arrays.stream(session.getUri().getPath().split("/")).collect(Collectors.toList()).get(2);
-                figi = securitiesRepository.findFigiByTicker(ticker).get();
-            } else {
-                session.close();
+            if(!uriSet.stream().filter(x -> x.getUri().equals(session.getUri())).findAny().isPresent()){
+                uriSet.add(session);
+                figi = findFigiByTicker(session);
+            }else{
+                log.info("Разрыв соединеия с предыдущим коннектом по uri: {}", session.getUri());
+                uriSet.stream().filter(x -> x.getUri().equals(session.getUri())).findAny().get().close();
+                uriSet.add(session);
+                uriSet.remove(uriSet.stream().filter(x -> x.getUri().equals(session.getUri())).findAny().get());
+                System.out.println(uriSet.size());
+                figi = findFigiByTicker(session);
             }
 
             while (session.isOpen()) {
@@ -78,13 +79,6 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
     }
 }
 
-
-
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        super.handleTextMessage(session, message);
-    }
-
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
@@ -95,4 +89,11 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
             log.info("Разрыв соединения с uri: {}", session.getUri());
         }
     }
+
+    public String findFigiByTicker(WebSocketSession session){
+        String ticker = Arrays.stream(Objects.requireNonNull(session.getUri()).getPath().split("/")).collect(Collectors.toList()).get(2);
+        Optional<String> figi = securitiesRepository.findFigiByTicker(ticker);
+        return figi.orElse(null);
+    }
+
 }

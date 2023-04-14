@@ -1,6 +1,5 @@
 package accelerator.group.brokerapp.Responses;
 
-import accelerator.group.brokerapp.Entity.Securities;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

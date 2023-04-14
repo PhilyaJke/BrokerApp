@@ -4,6 +4,7 @@ import {StocksCardProps, StocksPageProps, StocksPageRequest} from './useStocks.m
 import appConfig from "../../../config";
 
 const API_URL = appConfig.URL;
+const WS_URL = appConfig.WS;
 
 
 export const getStocks = async (props: StocksPageRequest): Promise<StocksPageProps> => {
@@ -61,6 +62,25 @@ export const searchStocksForSuggestion = async (search: string): Promise<StocksC
 
     return response.json();
 }
+
+export const getRealtimeStockPrice = (ticker: string, callback: (price: number) => void): WebSocket => {
+    const ws = new WebSocket(`${WS_URL}/price/${ticker}`);
+    console.log('NEW WS CONNECTION', ticker);
+    ws.onmessage = (event: MessageEvent) => {
+        // console.log('non decoded', event.data);
+        const { price } = JSON.parse(event.data);
+        callback(price[0]);
+    };
+
+    
+    // ws.onerror = (event: Event) => {
+    //     console.log('ws.onerror', event);
+    // };
+
+    return ws;
+};
+
+
 
 
 

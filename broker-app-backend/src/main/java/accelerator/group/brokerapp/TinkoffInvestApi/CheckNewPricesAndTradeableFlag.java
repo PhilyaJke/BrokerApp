@@ -29,15 +29,14 @@ public class CheckNewPricesAndTradeableFlag{
 
     private final SecuritiesRepository securitiesRepository;
     private final SecuritiesServiceImpl securitiesService;
-    private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
     private final AdditionalStocksInformationRepository additionalStocksInformationRepository;
 
     @Autowired
     public CheckNewPricesAndTradeableFlag(SecuritiesRepository securitiesRepository,
-                                          SecuritiesServiceImpl securitiesService, LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository, AdditionalStocksInformationRepository additionalStocksInformationRepository) {
+                                          SecuritiesServiceImpl securitiesService,
+                                          AdditionalStocksInformationRepository additionalStocksInformationRepository) {
         this.securitiesRepository = securitiesRepository;
         this.securitiesService = securitiesService;
-        this.lastPriceOfSecuritiesRepository = lastPriceOfSecuritiesRepository;
         this.additionalStocksInformationRepository = additionalStocksInformationRepository;
     }
 
@@ -49,15 +48,14 @@ public class CheckNewPricesAndTradeableFlag{
         for (int i = 0; i < 8; i += 1) {
             var securities = securitiesRepository.findLimitedSecurities(PageRequest.of(i, 299));
             var lastprices = securitiesService.returnInvestApiConnection().getMarketDataService().getLastPricesSync(securities);
-            for(int j = 0; j < lastprices.size(); j++){
-                if(lastprices.get(j).getFigi().isEmpty()){
-                    continue;
-                }else{
+            for (ru.tinkoff.piapi.contract.v1.LastPrice lastprice : lastprices) {
+                if (lastprice.getFigi().isEmpty()) {
+                } else {
                     for (int k = 0; k < securities.size(); k++) {
-                        if (!securitiesRepository.findSecurityByFigi(lastprices.get(j).getFigi()).equals(null)) {
-                            var sec = securitiesRepository.findSecurityByFigi(lastprices.get(j).getFigi()).getAdditionalStocksInformation();
-                            sec.setPrice(Double.valueOf(String.valueOf(lastprices.get(j).getPrice().getUnits()).concat(".")
-                                    .concat(String.valueOf(lastprices.get(j).getPrice().getNano()))));
+                        if (securitiesRepository.findSecurityByFigi(lastprice.getFigi()) != null) {
+                            var sec = securitiesRepository.findSecurityByFigi(lastprice.getFigi()).getAdditionalStocksInformation();
+                            sec.setPrice(Double.valueOf(String.valueOf(lastprice.getPrice().getUnits()).concat(".")
+                                    .concat(String.valueOf(lastprice.getPrice().getNano()))));
                             additionalStocksInformationRepository.save(sec);
                             break;
                         }

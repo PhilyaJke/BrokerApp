@@ -19,13 +19,7 @@ public interface RefreshTokensRepository extends JpaRepository<RefreshTokens, Lo
     @Query("select r.token FROM RefreshTokens r WHERE r.userUUID = ?1")
     String FindRefreshTokenByUserUUID(@Param(value = "userUUID") UUID userUUID);
 
-    @Query("select r FROM RefreshTokens r WHERE r.userUUID = ?1")
-    RefreshTokens FindByUserId(@Param(value = "userUUID") UUID userUUID);
-
     @Modifying
     @Query("DELETE FROM RefreshTokens r WHERE r.token = ?1")
     void deleteRefreshTokensByToken(@Param(value = "token") String token);
-
-    @Query("select r.userUUID FROM RefreshTokens r WHERE r.token = ?1")
-    UUID findUUDByToken(@Param(value = "token") String token);
 }

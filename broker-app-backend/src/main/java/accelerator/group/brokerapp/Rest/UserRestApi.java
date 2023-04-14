@@ -32,8 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-// Переписать все создание токенов в один метод
-// Поправить названия (auth -> login)
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
 @Slf4j
@@ -67,8 +65,8 @@ public class UserRestApi {
                 .orElseThrow(() -> new UsernameNotFoundException("User doesnt exist"));
 
 
-        String AccessToken = "";
-        String RefreshToken = "";
+        String AccessToken;
+        String RefreshToken;
         try {
             log.info("Запрос на логин пришел от пользователя 1 - {}", authenticationRequest.getEmail());
             Authentication authentication = authenticationManager.authenticate(
@@ -103,8 +101,8 @@ public class UserRestApi {
     @PostMapping("/api/auth/registration")
     public ResponseEntity registration(@RequestBody RegistrationRequest registrationRequest){
         log.info("Запрос на регистрацию пришел от пользователя - {}", registrationRequest.getEmail());
-        String AccessToken = "";
-        String RefreshToken = "";
+        String AccessToken;
+        String RefreshToken;
         if(userRepository.findByEmail(registrationRequest.getEmail()).isPresent()){
             return new ResponseEntity("User already exist", HttpStatus.FORBIDDEN);
         }else{
@@ -146,11 +144,5 @@ public class UserRestApi {
         refreshTokensRepository.deleteRefreshTokensByToken(Authorization);
         SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
         securityContextLogoutHandler.logout(httpServletRequest, httpServletResponse, null);
-    }
-
-    public String decodeJson(String json, String key){
-        Genson genson = new Genson();
-        Map<String, String> jsonMap = genson.deserialize(json, Map.class);
-        return jsonMap.get(key);
     }
 }

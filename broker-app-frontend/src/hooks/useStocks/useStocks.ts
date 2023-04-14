@@ -1,12 +1,11 @@
 import {useState} from "react";
-import {getStocks, searchStocksForSuggestion} from "./api";
+import {getRealtimeStockPrice, getStocks, searchStocksForSuggestion} from "./api";
 import {StocksCardProps, StocksPageProps, StocksPageRequest} from "./useStocks.model";
 
 
 const useStocks = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isDown, setIsDown] = useState<boolean>(false);
-    const [page, setPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(1);
 
 
@@ -17,7 +16,6 @@ const useStocks = () => {
             console.log('handleStocks stocksPage', props.region);
             setIsLoading(false);
             setIsDown(false)
-            setTotalPages(stocksPage.totalPages);
             return stocksPage.securitiesList
         } catch (e) {
             setIsLoading(false);
@@ -40,12 +38,24 @@ const useStocks = () => {
         }
     }
 
+    const handleRealtimePrice = (ticker: string, callback: (price: number) => void): () => void => {
+
+        const ws = getRealtimeStockPrice(ticker, (price: number) => {
+            callback(price);
+        });
+
+        return () => {
+            ws.close();
+        };
+
+    }
     return {
         isLoading,
         isDown,
         handleStocks,
         handleSearchForSuggestions,
         totalPages,
+        handleRealtimePrice,
     };
 };
 

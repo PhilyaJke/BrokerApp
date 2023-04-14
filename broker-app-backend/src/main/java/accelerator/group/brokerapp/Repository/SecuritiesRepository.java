@@ -41,15 +41,10 @@ public interface SecuritiesRepository extends JpaRepository<Securities, Long> {
             countName = "CountSecurities")
     List<SecuritiesFullInfoResponse> findAllSecuritiesPage(Pageable pageable);
 
-
     @Query(value = "SELECT s FROM Securities s WHERE s.Ticker = ?1")
     Optional<Securities> findByTicker(@Param(value = "ticker") String ticker);
 
     @Query(value = "SELECT s.Figi FROM Securities s WHERE s.Ticker = ?1")
     Optional<String> findFigiByTicker(@Param(value = "ticker") String ticker);
-
-    @Query(value = "SELECT s FROM Securities s WHERE s.iconPath = 'null'")
-    List<Securities> findSecuritiesWhereIconPathNull();
-
 
 }

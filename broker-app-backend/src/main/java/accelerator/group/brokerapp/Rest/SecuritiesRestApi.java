@@ -1,24 +1,14 @@
 package accelerator.group.brokerapp.Rest;
 
-import accelerator.group.brokerapp.Entity.LastPriceOfSecurities;
-import accelerator.group.brokerapp.Repository.LastPriceOfSecuritiesRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
 import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
-import accelerator.group.brokerapp.TinkoffInvestApi.CacheableLastPrices;
-import accelerator.group.brokerapp.WebSockets.WSHandler;
 import com.owlike.genson.Genson;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
-import java.net.URI;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
@@ -29,19 +19,13 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:5173")
 public class SecuritiesRestApi {
 
-    private final WSHandler WSHandler;
     private final SecuritiesServiceImpl securitiesService;
     private final SecuritiesRepository securitiesRepository;
-    private final CacheableLastPrices cacheableLastPrices;
-    private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
 
     @Autowired
-    public SecuritiesRestApi(WSHandler WSHandler, SecuritiesServiceImpl securitiesService, SecuritiesRepository securitiesRepository, CacheableLastPrices cacheableLastPrices, LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository) {
-        this.WSHandler = WSHandler;
+    public SecuritiesRestApi(SecuritiesServiceImpl securitiesService, SecuritiesRepository securitiesRepository) {
         this.securitiesService = securitiesService;
         this.securitiesRepository = securitiesRepository;
-        this.cacheableLastPrices = cacheableLastPrices;
-        this.lastPriceOfSecuritiesRepository = lastPriceOfSecuritiesRepository;
     }
 
     @GetMapping("/api/securities/list/securities")
@@ -85,14 +69,14 @@ public class SecuritiesRestApi {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         var s = securitiesService.getSecuritiesInfoFromApi(securitiesRepository.findByTicker(ticker).get().getFigi());
         List<Map<String, Object>> list = new ArrayList<>();
-        for(int i = 0; i < s.size(); i++){
-            parseToDoublePrice(s.get(i).getHigh().getUnits(), s.get(i).getHigh().getNano() );
+        for (ru.tinkoff.piapi.contract.v1.HistoricCandle historicCandle : s) {
+            parseToDoublePrice(historicCandle.getHigh().getUnits(), historicCandle.getHigh().getNano());
             Map<String, Object> map = new HashMap();
-            map.put("high", parseToDoublePrice(s.get(i).getHigh().getUnits(), s.get(i).getHigh().getNano()));
-            map.put("low", parseToDoublePrice(s.get(i).getLow().getUnits(), s.get(i).getLow().getNano()));
-            map.put("close", parseToDoublePrice(s.get(i).getClose().getUnits(), s.get(i).getClose().getNano()));
-            map.put("open", parseToDoublePrice(s.get(i).getOpen().getUnits(), s.get(i).getOpen().getNano()));
-            map.put("date", simpleDateFormat.format(Date.from(Instant.ofEpochSecond(s.get(i).getTime().getSeconds()))));
+            map.put("high", parseToDoublePrice(historicCandle.getHigh().getUnits(), historicCandle.getHigh().getNano()));
+            map.put("low", parseToDoublePrice(historicCandle.getLow().getUnits(), historicCandle.getLow().getNano()));
+            map.put("close", parseToDoublePrice(historicCandle.getClose().getUnits(), historicCandle.getClose().getNano()));
+            map.put("open", parseToDoublePrice(historicCandle.getOpen().getUnits(), historicCandle.getOpen().getNano()));
+            map.put("date", simpleDateFormat.format(Date.from(Instant.ofEpochSecond(historicCandle.getTime().getSeconds()))));
             list.add(map);
         }
         return ResponseEntity.ok(list);
