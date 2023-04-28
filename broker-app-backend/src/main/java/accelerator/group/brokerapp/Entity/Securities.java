@@ -4,6 +4,7 @@ import accelerator.group.brokerapp.Responses.SecuritiesFullInfoResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 import javax.persistence.*;
 
@@ -12,24 +13,24 @@ import javax.persistence.*;
         @NamedNativeQuery(
                 name = "FindFullStocksInfo",
                 query = "SELECT s.region, s.figi, asi.price, s.name, s.ticker, s.sector, s.icon_path" +
-                        " FROM securities s" +
-                        " INNER JOIN additional_stocks_information asi on asi.id = s.additional_info_id",
+                        " FROM additional_stocks_information asi" +
+                        " INNER JOIN securities s on asi.securities_id = s.id",
                 resultSetMapping = "Mapping.SecuritiesFullInfoResponse"
         ),
 
         @NamedNativeQuery(
                 name = "FindRUStocksInfo",
                 query = "SELECT s.region, s.figi, asi.price, s.name, s.ticker, s.sector, s.icon_path" +
-                        " FROM securities s" +
-                        " INNER JOIN additional_stocks_information asi on asi.id = s.additional_info_id WHERE s.region = 'RU'",
+                        " FROM additional_stocks_information asi" +
+                        " INNER JOIN securities s on asi.securities_id = s.id WHERE s.region = 'RU'",
                 resultSetMapping = "Mapping.SecuritiesFullInfoResponse"
         ),
 
         @NamedNativeQuery(
                 name = "FindForeignStocksInfo",
                 query = "SELECT s.region, s.figi, asi.price, s.name, s.ticker, s.sector, s.icon_path" +
-                        " FROM securities s" +
-                        " INNER JOIN additional_stocks_information asi on asi.id = s.additional_info_id WHERE s.region <> 'RU'",
+                        " FROM additional_stocks_information asi" +
+                        " INNER JOIN securities s on asi.securities_id = s.id WHERE s.region <> 'RU'",
                 resultSetMapping = "Mapping.SecuritiesFullInfoResponse"
         ),
 
@@ -56,6 +57,7 @@ import javax.persistence.*;
 
 @Entity
 @Data
+@Getter
 @AllArgsConstructor
 @Table(name = "Securities")
 public class Securities {
@@ -85,21 +87,15 @@ public class Securities {
     @Column(name = "icon_path")
     private String iconPath;
 
-    @MapsId
-    @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "additional_info_id")
-    private AdditionalStocksInformation additionalStocksInformation;
-
     public Securities() {
 
     }
 
-    public Securities(String figi, String name, String ticker, String region, String sector, AdditionalStocksInformation additionalStocksInformation) {
+    public Securities(String figi, String name, String ticker, String region, String sector) {
         Figi = figi;
         Name = name;
         Ticker = ticker;
         this.region = region;
         Sector = sector;
-        this.additionalStocksInformation = additionalStocksInformation;
     }
 }

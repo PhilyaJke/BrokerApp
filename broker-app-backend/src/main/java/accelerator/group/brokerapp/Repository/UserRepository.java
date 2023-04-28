@@ -1,5 +1,6 @@
 package accelerator.group.brokerapp.Repository;
 
+import accelerator.group.brokerapp.Entity.BrokeragePortfolio;
 import accelerator.group.brokerapp.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

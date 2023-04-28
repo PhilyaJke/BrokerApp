@@ -1,17 +1,16 @@
 package accelerator.group.brokerapp.Rest;
 
-import accelerator.group.brokerapp.Entity.RefreshTokens;
-import accelerator.group.brokerapp.Entity.Role;
-import accelerator.group.brokerapp.Entity.Status;
-import accelerator.group.brokerapp.Entity.User;
+import accelerator.group.brokerapp.Entity.*;
+import accelerator.group.brokerapp.Repository.BrokeragePortfolioRepository;
 import accelerator.group.brokerapp.Repository.RefreshTokensRepository;
 import accelerator.group.brokerapp.Repository.UserRepository;
 import accelerator.group.brokerapp.Requests.RegistrationRequest;
 import accelerator.group.brokerapp.Requests.AuthenticationRequest;
 import accelerator.group.brokerapp.Security.JwtTokenProvider;
 import accelerator.group.brokerapp.Service.UserService.UserServiceImpl;
-import com.owlike.genson.Genson;
+import com.sun.xml.bind.v2.TODO;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +36,8 @@ import java.util.Map;
 @Slf4j
 public class UserRestApi {
 
+    //TODO сделать mapsid на табличку с рефрешами + сделать нормально количество акций в отдельной сводной таблице
+
     private PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
@@ -45,16 +46,18 @@ public class UserRestApi {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final UserServiceImpl userService;
+    private final BrokeragePortfolioRepository brokeragePortfolioRepository;
 
     @Autowired
     public UserRestApi(UserRepository userRepository,
                        RefreshTokensRepository refreshTokensRepository, JwtTokenProvider jwtTokenProvider,
-                       AuthenticationManager authenticationManager, UserServiceImpl userService) {
+                       AuthenticationManager authenticationManager, UserServiceImpl userService, BrokeragePortfolioRepository brokeragePortfolioRepository) {
         this.userRepository = userRepository;
         this.refreshTokensRepository = refreshTokensRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
+        this.brokeragePortfolioRepository = brokeragePortfolioRepository;
     }
 
     @Transactional
@@ -64,23 +67,18 @@ public class UserRestApi {
         User user = userRepository.findByEmail(authenticationRequest.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User doesnt exist"));
 
-
         String AccessToken;
         String RefreshToken;
+
         try {
-            log.info("Запрос на логин пришел от пользователя 1 - {}", authenticationRequest.getEmail());
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getUsername(), authenticationRequest.getPassword()));
-            log.info("Запрос на логин пришел от пользователя 2 - {}", authenticationRequest.getEmail());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.info("Запрос на логин пришел от пользователя 3 - {}", authenticationRequest.getEmail());
             AccessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().name());
             RefreshToken = jwtTokenProvider.createRefreshToken(user.getUsername(), user.getRole().name());
-            log.info("Запрос на логин пришел от пользователя 4 - {}", authenticationRequest.getEmail());
             if(refreshTokensRepository.FindRefreshTokenByUserUUID(userRepository.findByUsername(user.getUsername()).get().getId())!=null){
                 refreshTokensRepository.deleteRefreshTokensByUserUUID(userRepository.findByUsername(user.getUsername()).get().getId());
             }
-            log.info("Запрос на логин пришел от пользователя 5 - {}", authenticationRequest.getEmail());
             RefreshTokens refreshTokens = new RefreshTokens();
             refreshTokens.setToken(RefreshToken);
             refreshTokens.setUserUUID(user.getId());
@@ -110,6 +108,9 @@ public class UserRestApi {
             User user = new User(registrationRequest.getUsername(), passwordEncoder().encode(registrationRequest.getPassword()),
                     null, registrationRequest.getEmail(),
                     Role.USER, Status.ACTIVE);
+            BrokeragePortfolio brokeragePortfolio = new BrokeragePortfolio();
+            brokeragePortfolio.setUser(user);
+            brokeragePortfolioRepository.save(brokeragePortfolio);
             userService.saveUser(user);
             User user1 = userRepository.findByUsername(registrationRequest.getUsername()).get();
             AccessToken = jwtTokenProvider.createAccessToken(user1.getUsername(), user1.getRole().name());
@@ -137,12 +138,24 @@ public class UserRestApi {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
+    //Не работает - доделать
     @Transactional
     @GetMapping("/api/auth/logout")
-    public void logout(@RequestHeader(value = "Authorization") String Authorization, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public void logout(@RequestHeader(value = "Authorization") String Authorization, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         log.info("Запрос на выход из приложения ");
         refreshTokensRepository.deleteRefreshTokensByToken(Authorization);
         SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
         securityContextLogoutHandler.logout(httpServletRequest, httpServletResponse, null);
+    }
+
+    @GetMapping("/api/profile")
+    public ResponseEntity userProfile(HttpServletRequest httpServletRequest){
+        var request =  httpServletRequest.getHeader("Authorization");
+        String username = jwtTokenProvider.getUsername(request);
+        User user = userRepository.findByUsername(username).get();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.append("username", user.getUsername());
+        jsonObject.append("securities", brokeragePortfolioRepository.findSecuritiesByUser(user.getId()));
+        return ResponseEntity.ok(jsonObject);
     }
 }

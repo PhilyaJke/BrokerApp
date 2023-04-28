@@ -3,7 +3,6 @@ package accelerator.group.brokerapp.TinkoffInvestApi;
 import accelerator.group.brokerapp.Entity.AdditionalStocksInformation;
 import accelerator.group.brokerapp.Entity.Securities;
 import accelerator.group.brokerapp.Repository.AdditionalStocksInformationRepository;
-import accelerator.group.brokerapp.Repository.LastPriceOfSecuritiesRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
 import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +39,39 @@ public class CheckNewPricesAndTradeableFlag{
         this.additionalStocksInformationRepository = additionalStocksInformationRepository;
     }
 
+//Обновить и сделать автоматическое добавление иконок
+    @Async
+    @Transactional
+    @Scheduled(fixedDelay = 10000000l)
+    protected void addNewSecurities() {
+        log.info("Проверка на наличие новых акций");
+        try {
+            List<Share> shares = securitiesService.returnInvestApiConnection().getInstrumentsService().getTradableSharesSync();
+            for (int i = 0; i < shares.size(); i++) {
+                if (!securitiesRepository.findAllFigiSecurities().contains(shares.get(i).getFigi())) {
+
+                    Securities securities = new Securities(
+                            shares.get(i).getFigi(),
+                            shares.get(i).getName(),
+                            shares.get(i).getTicker(),
+                            shares.get(i).getCountryOfRisk(),
+                            shares.get(i).getSector()
+                    );
+
+                    AdditionalStocksInformation additionalStocksInformation = new AdditionalStocksInformation(
+                            shares.get(i).getLot(),
+                            securities
+                    );
+
+                    additionalStocksInformationRepository.save(additionalStocksInformation);
+                    securitiesRepository.save(securities);
+                }
+            }
+        }catch (ApiRuntimeException exc){
+            addNewSecurities();
+            log.trace("какая-то ошибка тинькофф апи");
+        }
+    }
 
     @Async
     @Scheduled(fixedDelay = 2000000)
@@ -52,52 +84,18 @@ public class CheckNewPricesAndTradeableFlag{
                 if (lastprice.getFigi().isEmpty()) {
                 } else {
                     for (int k = 0; k < securities.size(); k++) {
-                        if (securitiesRepository.findSecurityByFigi(lastprice.getFigi()) != null) {
-                            var sec = securitiesRepository.findSecurityByFigi(lastprice.getFigi()).getAdditionalStocksInformation();
-                            sec.setPrice(Double.valueOf(String.valueOf(lastprice.getPrice().getUnits()).concat(".")
+                        if (securitiesRepository.findSecurityByFigi(lastprice.getFigi()) != null && k >= 6) {
+                            var additionalStocksInformation = additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findSecurityByFigi(lastprice.getFigi()).getId());
+                            additionalStocksInformation.setPrice(Double.valueOf(String.valueOf(lastprice.getPrice().getUnits()).concat(".")
                                     .concat(String.valueOf(lastprice.getPrice().getNano()))));
-                            additionalStocksInformationRepository.save(sec);
+                            additionalStocksInformationRepository.save(additionalStocksInformation);
                             break;
                         }
                     }
                 }
             }
         }
-    log.info("Конец проверки цен акций");
-}
-
-
-//Обновить и сделать автоматическое добавление иконок
-    @Transactional
-    @Scheduled(fixedDelay = 10000000l)
-    @Async
-    protected void addNewSecurities() {
-        log.info("Проверка на наличие новых акций");
-        try {
-            List<Share> shares = securitiesService.returnInvestApiConnection().getInstrumentsService().getTradableSharesSync();
-            for (int i = 0; i < shares.size(); i++) {
-                if (!securitiesRepository.findAllFigiSecurities().contains(shares.get(i).getFigi())) {
-
-                    AdditionalStocksInformation additionalStocksInformation = new AdditionalStocksInformation(
-                            shares.get(i).getLot()
-                    );
-
-                    Securities securities = new Securities(
-                            shares.get(i).getFigi(),
-                            shares.get(i).getName(),
-                            shares.get(i).getTicker(),
-                            shares.get(i).getCountryOfRisk(),
-                            shares.get(i).getSector(),
-                            additionalStocksInformation
-                    );
-
-                    securitiesRepository.save(securities);
-                    additionalStocksInformationRepository.save(additionalStocksInformation);
-                }
-            }
-        }catch (ApiRuntimeException exc){
-            addNewSecurities();
-            log.trace("какая-то ошибка тинькофф апи");
-        }
+        log.info("Конец проверки цен акций");
     }
+
 }
