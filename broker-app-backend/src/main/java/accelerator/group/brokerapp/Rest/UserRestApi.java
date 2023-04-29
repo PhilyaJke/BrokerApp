@@ -2,13 +2,13 @@ package accelerator.group.brokerapp.Rest;
 
 import accelerator.group.brokerapp.Entity.*;
 import accelerator.group.brokerapp.Repository.BrokeragePortfolioRepository;
+import accelerator.group.brokerapp.Repository.BrokeragePortfolioSecuritiesRepository;
 import accelerator.group.brokerapp.Repository.RefreshTokensRepository;
 import accelerator.group.brokerapp.Repository.UserRepository;
 import accelerator.group.brokerapp.Requests.RegistrationRequest;
 import accelerator.group.brokerapp.Requests.AuthenticationRequest;
 import accelerator.group.brokerapp.Security.JwtTokenProvider;
 import accelerator.group.brokerapp.Service.UserService.UserServiceImpl;
-import com.sun.xml.bind.v2.TODO;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,17 +47,23 @@ public class UserRestApi {
     private final AuthenticationManager authenticationManager;
     private final UserServiceImpl userService;
     private final BrokeragePortfolioRepository brokeragePortfolioRepository;
+    private final BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository;
 
     @Autowired
     public UserRestApi(UserRepository userRepository,
-                       RefreshTokensRepository refreshTokensRepository, JwtTokenProvider jwtTokenProvider,
-                       AuthenticationManager authenticationManager, UserServiceImpl userService, BrokeragePortfolioRepository brokeragePortfolioRepository) {
+                       RefreshTokensRepository refreshTokensRepository,
+                       JwtTokenProvider jwtTokenProvider,
+                       AuthenticationManager authenticationManager,
+                       UserServiceImpl userService,
+                       BrokeragePortfolioRepository brokeragePortfolioRepository,
+                       BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository) {
         this.userRepository = userRepository;
         this.refreshTokensRepository = refreshTokensRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.brokeragePortfolioRepository = brokeragePortfolioRepository;
+        this.brokeragePortfolioSecuritiesRepository = brokeragePortfolioSecuritiesRepository;
     }
 
     @Transactional
@@ -149,13 +155,12 @@ public class UserRestApi {
     }
 
     @GetMapping("/api/profile")
-    public ResponseEntity userProfile(HttpServletRequest httpServletRequest){
-        var request =  httpServletRequest.getHeader("Authorization");
-        String username = jwtTokenProvider.getUsername(request);
-        User user = userRepository.findByUsername(username).get();
+    public ResponseEntity userProfile(@RequestHeader(value = "Authorization") String Authorization){
+        User user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization)).get();
+        log.info("Профиль пользователя - {}", user.getUsername());
         JSONObject jsonObject = new JSONObject();
         jsonObject.append("username", user.getUsername());
-        jsonObject.append("securities", brokeragePortfolioRepository.findSecuritiesByUser(user.getId()));
-        return ResponseEntity.ok(jsonObject);
+        jsonObject.append("securities", brokeragePortfolioSecuritiesRepository.findUsersSecuritiesById(user.getId()));
+        return ResponseEntity.ok(jsonObject.toMap());
     }
 }

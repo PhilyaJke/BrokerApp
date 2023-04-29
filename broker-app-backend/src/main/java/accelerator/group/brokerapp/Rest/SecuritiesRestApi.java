@@ -14,7 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
@@ -100,58 +99,56 @@ public class SecuritiesRestApi {
         }
         jsonObject.put("candles", list);
         jsonObject.put("lot", additionalStocksInformationRepository.findAddStocksInfoById(security.getId()).getLot());
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(jsonObject.toMap());
     }
 
     @PostMapping("/api/buySecurity")
-    public ResponseEntity buySecurity(@RequestBody BuySecurityRequest buySecurityRequest, HttpServletRequest httpServletRequest){
+    public ResponseEntity buySecurity(@RequestBody BuySecurityRequest buySecurityRequest,
+                                      @RequestHeader(value = "Authorization") String Authorization){
         log.info("Покупка акций - {}", buySecurityRequest.getTicker());
-        var request =  httpServletRequest.getHeader("Authorization");
-        String username = jwtTokenProvider.getUsername(request);
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization));
         if(user.isPresent()){
             var securities = securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get();
-            var portfolio = brokeragePortfolioRepository
-                    .findPortfolioByUserIdAndBrokeragePortfolioSecurities(user.get().getId(), securities.getId())
-                    .getBrokeragePortfolioSecurities().stream().findFirst();
-            if(portfolio.isPresent()) {
-                portfolio.get().setCount(
-                        portfolio.get().getCount()+buySecurityRequest.getValue()
+            var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(user.get().getId(), securities.getId());
+            if(portfolio != null) {
+                var subposrtfolio = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get();
+                subposrtfolio.setCount(
+                        subposrtfolio.getCount()+buySecurityRequest.getValue()*additionalStocksInformationRepository.findAddStocksInfoById(securities.getId()).getLot()
                 );
-                brokeragePortfolioSecuritiesRepository.save(portfolio.get());
+                brokeragePortfolioSecuritiesRepository.save(subposrtfolio);
             }else{
+                var brokeragePortfolio = brokeragePortfolioRepository.findPortfolioByUserId(user.get().getId());
                 BrokeragePortfolioSecurities brokeragePortfolioSecurities = new BrokeragePortfolioSecurities(
                         securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get(),
-                        buySecurityRequest.getValue()
+                        brokeragePortfolio,
+                        buySecurityRequest.getValue()*additionalStocksInformationRepository.findAddStocksInfoById(securities.getId()).getLot()
                 );
                 brokeragePortfolioSecuritiesRepository.save(brokeragePortfolioSecurities);
             }
-            return ResponseEntity.ok(buildJson(buySecurityRequest));
+            return ResponseEntity.ok(buildJson(buySecurityRequest).toMap());
         }else{
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/api/sellSecurity")
-    public ResponseEntity sellSecurity(@RequestBody BuySecurityRequest buySecurityRequest, HttpServletRequest httpServletRequest){
+    public ResponseEntity sellSecurity(@RequestBody BuySecurityRequest buySecurityRequest,
+                                       @RequestHeader(value = "Authorization") String Authorization){
         log.info("Продажа акций - {}", buySecurityRequest.getTicker());
-        var request =  httpServletRequest.getHeader("Authorization");
-        String username = jwtTokenProvider.getUsername(request);
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization));
         if(user.isPresent()) {
             var securities = securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get();
-            var portfolio = brokeragePortfolioRepository
-                    .findPortfolioByUserIdAndBrokeragePortfolioSecurities(user.get().getId(), securities.getId())
-                    .getBrokeragePortfolioSecurities().stream().findFirst();
-            if(portfolio.isPresent() && portfolio.get().getCount() > buySecurityRequest.getValue()){
-                portfolio.get().setCount(
-                        portfolio.get().getCount()-buySecurityRequest.getValue()
+            var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(user.get().getId(), securities.getId());
+            var subposrtfolio = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get();
+            if(subposrtfolio!=null && subposrtfolio.getCount() > buySecurityRequest.getValue()){
+                subposrtfolio.setCount(
+                        subposrtfolio.getCount()-buySecurityRequest.getValue()*additionalStocksInformationRepository.findAddStocksInfoById(securities.getId()).getLot()
                 );
-                brokeragePortfolioSecuritiesRepository.save(portfolio.get());
-            }else if(portfolio.isPresent() && portfolio.get().getCount() == buySecurityRequest.getValue()){
-                brokeragePortfolioSecuritiesRepository.deleteById(portfolio.get().getId());
+                brokeragePortfolioSecuritiesRepository.save(subposrtfolio);
+            }else if(portfolio!=null && subposrtfolio.getCount() == buySecurityRequest.getValue()){
+                brokeragePortfolioSecuritiesRepository.deleteById(subposrtfolio.getId());
             }
-            return ResponseEntity.ok(buildJson(buySecurityRequest));
+            return ResponseEntity.ok(buildJson(buySecurityRequest).toMap());
         }else{
             return ResponseEntity.notFound().build();
         }
@@ -173,8 +170,13 @@ public class SecuritiesRestApi {
     public JSONObject buildJson(BuySecurityRequest buySecurityRequest){
         JSONObject jsonObject = new JSONObject();
         jsonObject.append("count", buySecurityRequest.getValue());
-        jsonObject.append("price", lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).get().getPrice());
-        jsonObject.append("sum", lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).get().getPrice()*buySecurityRequest.getValue());
+        if(lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).isPresent()) {
+            jsonObject.append("price", lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).get().getPrice());
+            jsonObject.append("sum", lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).get().getPrice() * buySecurityRequest.getValue());
+        }else{
+            jsonObject.append("price", additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getId()).getPrice());
+            jsonObject.append("sum", additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getId()).getPrice() * buySecurityRequest.getValue());
+        }
         return jsonObject;
     }
 }

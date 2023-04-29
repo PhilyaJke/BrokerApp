@@ -14,10 +14,6 @@ public interface BrokeragePortfolioRepository extends JpaRepository<BrokeragePor
     @Query(name = "FindUsersSecurities", nativeQuery = true)
     List<Securities> findSecuritiesByUser(@Param(value = "id") UUID id);
 
-    @Query(value = "SELECT b FROM brokerage_portfolio b INNER JOIN brokerage_portfolio_brokerage_portfolio_securities bpbps on b.id = bpbps.brokerage_portfolio_id " +
-            "WHERE cast(b.user_id as varchar(255)) LIKE cast(?1 as varchar(255)) AND bpbps.brokerage_portfolio_securities_id = ?2", nativeQuery = true)
-    BrokeragePortfolio findPortfolioByUserIdAndBrokeragePortfolioSecurities(@Param(value = "uid") UUID uid, @Param(value = "id") long id);
-
-    @Query(value = "SELECT b FROM brokerage_portfolio b WHERE cast(b.user_id as varchar(255)) LIKE cast(?1 as varchar(255))", nativeQuery = true)
+    @Query(value = "SELECT * FROM brokerage_portfolio b WHERE cast(b.user_id as varchar(255)) = cast(?1 as varchar(255))", nativeQuery = true)
     BrokeragePortfolio findPortfolioByUserId(@Param(value = "uid") UUID uid);
 }

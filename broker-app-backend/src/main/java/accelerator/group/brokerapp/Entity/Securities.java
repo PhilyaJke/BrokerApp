@@ -98,4 +98,13 @@ public class Securities {
         this.region = region;
         Sector = sector;
     }
+
+    public Securities(String figi, String name, String ticker, String region, String sector, String iconPath) {
+        Figi = figi;
+        Name = name;
+        Ticker = ticker;
+        this.region = region;
+        Sector = sector;
+        this.iconPath = iconPath;
+    }
 }

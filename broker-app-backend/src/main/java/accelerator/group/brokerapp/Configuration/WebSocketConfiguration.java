@@ -17,18 +17,21 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
     private final SecuritiesRepository securitiesRepository;
     private final UserRepository userRepository;
+    private final BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository;
 
     @Autowired
     public WebSocketConfiguration(AdditionalStocksInformationRepository additionalStocksInformationRepository,
                                   BrokeragePortfolioRepository brokeragePortfolioRepository,
                                   LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository,
                                   SecuritiesRepository securitiesRepository,
-                                  UserRepository userRepository) {
+                                  UserRepository userRepository,
+                                  BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository) {
         this.additionalStocksInformationRepository = additionalStocksInformationRepository;
         this.brokeragePortfolioRepository = brokeragePortfolioRepository;
         this.lastPriceOfSecuritiesRepository = lastPriceOfSecuritiesRepository;
         this.securitiesRepository = securitiesRepository;
         this.userRepository = userRepository;
+        this.brokeragePortfolioSecuritiesRepository = brokeragePortfolioSecuritiesRepository;
     }
 
     @Override
@@ -47,6 +50,6 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Bean
     public UserProfileHandler userHandler(){
-        return new UserProfileHandler(lastPriceOfSecuritiesRepository, securitiesRepository, brokeragePortfolioRepository, userRepository, additionalStocksInformationRepository);
+        return new UserProfileHandler(lastPriceOfSecuritiesRepository, securitiesRepository, brokeragePortfolioRepository, userRepository, additionalStocksInformationRepository, brokeragePortfolioSecuritiesRepository);
     }
 }

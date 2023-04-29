@@ -26,58 +26,68 @@ public class UserProfileHandler extends TextWebSocketHandler implements WebSocke
     private final BrokeragePortfolioRepository brokeragePortfolioRepository;
     private final UserRepository userRepository;
     private final AdditionalStocksInformationRepository additionalStocksInformationRepository;
+    private final BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository;
 
     @Autowired
     public UserProfileHandler(LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository,
                               SecuritiesRepository securitiesRepository,
                               BrokeragePortfolioRepository brokeragePortfolioRepository,
                               UserRepository userRepository,
-                              AdditionalStocksInformationRepository additionalStocksInformationRepository) {
+                              AdditionalStocksInformationRepository additionalStocksInformationRepository,
+                              BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository) {
         this.lastPriceOfSecuritiesRepository = lastPriceOfSecuritiesRepository;
         this.securitiesRepository = securitiesRepository;
         this.brokeragePortfolioRepository = brokeragePortfolioRepository;
         this.userRepository = userRepository;
         this.additionalStocksInformationRepository = additionalStocksInformationRepository;
+        this.brokeragePortfolioSecuritiesRepository = brokeragePortfolioSecuritiesRepository;
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         log.info("Запрос на соединения с портфелем - {}", session.getUri().getPath());
-        double price = 0.0;
+
+        JSONObject jsonObject = new JSONObject();
 
         try {
             String username = findFigiByTicker(session);
             List<Securities> securities = brokeragePortfolioRepository.findSecuritiesByUser(userRepository.UserProfileInfo(username).getId());
             while (session.isOpen()) {
+                Double price;
                 JSONObject jsonPrices = new JSONObject();
                 JSONObject jsonSumPrice = new JSONObject();
                 double sum = 0;
                 Map<String, JSONObject> map = new HashMap<>();
                 for (int i = 0; i < securities.size(); i++) {
                     Optional<LastPriceOfSecurities> lastPriceOfSecurities = lastPriceOfSecuritiesRepository.findById(securities.get(i).getFigi());
-                    var additionalStocksInformation = additionalStocksInformationRepository.findAddStocksInfoById(securities.get(i).getId());
+                    //Переписать на нормальный запрос к бд
+                    var additionalStocksInformation = additionalStocksInformationRepository
+                            .findAddStocksInfoById(securitiesRepository.findSecurityByFigi(securities.get(i).getFigi()).getId());
                     if (lastPriceOfSecurities.isPresent()) {
                         Double prices = lastPriceOfSecurities.get().getPrice();
-                        if (price != prices) {
-                            price = prices;
-                            sum += prices * additionalStocksInformation.getLot();
-                            jsonPrices.put(securities.get(i).getTicker(), prices * additionalStocksInformation.getLot());
-                            jsonSumPrice.put("budjet", sum);
-                            map.put("securitiesPrices", jsonPrices);
-                            map.put("summaryPrices", jsonPrices);
-                            session.sendMessage(new TextMessage(map.toString()));
-                        }
+                            var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(
+                                    userRepository.UserProfileInfo(username).getId(), securitiesRepository.findSecurityByFigi(securities.get(i).getFigi()).getId());
+                            price = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get().getCount() * prices * additionalStocksInformation.getLot();;
+                            sum += price;
+                            jsonPrices.put(securities.get(i).getTicker(), price);
                     } else {
-                        if (price != additionalStocksInformation.getPrice()) {
-                            sum += additionalStocksInformation.getPrice() * additionalStocksInformation.getLot();
-                            jsonPrices.put(securities.get(i).getTicker(), additionalStocksInformation.getPrice() * additionalStocksInformation.getLot());
-                            jsonSumPrice.put("budjet", sum);
-                            map.put("securitiesPrices", jsonPrices);
-                            map.put("summaryPrices", jsonPrices);
-                            session.sendMessage(new TextMessage(map.toString()));
-                        }
+                            var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(
+                                    userRepository.UserProfileInfo(username).getId(), securitiesRepository.findSecurityByFigi(securities.get(i).getFigi()).getId());
+                            price = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get().getCount() * additionalStocksInformation.getPrice() * additionalStocksInformation.getLot();;
+                            sum += price;
+                            jsonPrices.put(securities.get(i).getTicker(), price);
                     }
                 }
+
+                if(!jsonObject.similar(jsonPrices)){
+                    jsonSumPrice.put("budjet", sum);
+                    map.put("securitiesPrices", jsonPrices);
+                    map.put("summaryPrices", jsonSumPrice);
+                    session.sendMessage(new TextMessage(map.toString()));
+                    jsonObject.clear();
+                    jsonObject = jsonPrices;
+                }
+
             }
         }catch (IOException | IllegalStateException exc){
             log.info("Разрыв соединения с uri: {}", session.getUri());
