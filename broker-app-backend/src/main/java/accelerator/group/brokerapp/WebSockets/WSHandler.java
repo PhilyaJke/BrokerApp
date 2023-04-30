@@ -1,6 +1,7 @@
 package accelerator.group.brokerapp.WebSockets;
 
 import accelerator.group.brokerapp.Entity.LastPriceOfSecurities;
+import accelerator.group.brokerapp.Repository.AdditionalStocksInformationRepository;
 import accelerator.group.brokerapp.Repository.LastPriceOfSecuritiesRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +23,17 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
 
     private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
     private final SecuritiesRepository securitiesRepository;
+    private final AdditionalStocksInformationRepository additionalStocksInformationRepository;
 
     @Autowired
-    public WSHandler(LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository, SecuritiesRepository securitiesRepository) {
+    public WSHandler(LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository,
+                     SecuritiesRepository securitiesRepository, AdditionalStocksInformationRepository additionalStocksInformationRepository) {
         this.lastPriceOfSecuritiesRepository = lastPriceOfSecuritiesRepository;
         this.securitiesRepository = securitiesRepository;
+        this.additionalStocksInformationRepository = additionalStocksInformationRepository;
     }
 
+    /// Добавить таймер по истечению времени которого будет закрываться коннект
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
@@ -48,7 +53,6 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
                 uriSet.stream().filter(x -> x.getUri().equals(session.getUri())).findAny().get().close();
                 uriSet.add(session);
                 uriSet.remove(uriSet.stream().filter(x -> x.getUri().equals(session.getUri())).findAny().get());
-                System.out.println(uriSet.size());
                 figi = findFigiByTicker(session);
             }
 
@@ -63,7 +67,7 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
                         session.sendMessage(new TextMessage(jsonObject.toString()));
                     }
                 } else {
-                    Double price = securitiesRepository.findSecurityByFigi(figi).getAdditionalStocksInformation().getPrice();
+                    Double price = additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findSecurityByFigi(figi).getId()).getPrice();
                     if(!price.equals(actualPrice)){
                         actualPrice = price;
                         JSONObject jsonObject = new JSONObject();

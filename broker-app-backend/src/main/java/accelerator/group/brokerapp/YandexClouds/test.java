@@ -8,11 +8,13 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.Optional;
 
-//@Component
 public class test{
 
     SecuritiesRepository securitiesRepository;
@@ -45,9 +47,9 @@ public class test{
                 .build();
 
 
-        var listFiles = new File("/Users/philyaborozdin/Desktop/icons2").listFiles();
+        var listFiles = new File("/Users/philyaborozdin/Desktop/icons").listFiles();
         for(int i = count; i < listFiles.length; i++){
-            try {
+//            try {
                 var s = s3.getObject("securitiesicons", listFiles[i].getName());
                 Optional<Securities> securities = securitiesRepository.findByTicker(listFiles[i].getName().substring(0, listFiles[i].getName().length()-4));
                 if(s.equals(null) || securities.isEmpty()){
@@ -58,11 +60,9 @@ public class test{
                     securitiesRepository.save(securities.get());
                     count++;
                 }
-            }catch (SdkClientException exc){
-                addIconsPaths(count);
-            }
+//            }catch (SdkClientException exc){
+//                addIconsPaths(count);
+//            }
         }
     }
-
-
 }

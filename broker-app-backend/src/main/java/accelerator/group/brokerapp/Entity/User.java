@@ -2,6 +2,7 @@ package accelerator.group.brokerapp.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.Getter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -10,7 +11,9 @@ import javax.persistence.GeneratedValue;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+
 @Entity
+@Getter
 @Table(name = "users")
 @Data
 public class User {

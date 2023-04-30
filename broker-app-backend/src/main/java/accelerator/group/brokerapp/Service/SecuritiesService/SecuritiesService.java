@@ -2,7 +2,6 @@ package accelerator.group.brokerapp.Service.SecuritiesService;
 
 import accelerator.group.brokerapp.Entity.Securities;
 import accelerator.group.brokerapp.Responses.SecuritiesPageResponse;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ru.tinkoff.piapi.core.InvestApi;
 
@@ -15,6 +14,8 @@ public interface SecuritiesService {
     SecuritiesPageResponse findAllRuSecuritiesPage(Pageable pageable);
 
     SecuritiesPageResponse findAllForeignSecuritiesPage(Pageable pageable);
+
+    List<Securities> findSecuritiesByRequest(String request);
 
     InvestApi returnInvestApiConnection();
 

@@ -1,11 +1,13 @@
 package accelerator.group.brokerapp.Service.SecuritiesService;
 
+import accelerator.group.brokerapp.Entity.Securities;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
 import accelerator.group.brokerapp.Responses.SecuritiesFullInfoResponse;
 import accelerator.group.brokerapp.Responses.SecuritiesPageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.tinkoff.piapi.contract.v1.CandleInterval;
 import ru.tinkoff.piapi.contract.v1.HistoricCandle;
@@ -13,6 +15,9 @@ import ru.tinkoff.piapi.core.InvestApi;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SecuritiesServiceImpl implements SecuritiesService{
@@ -49,6 +54,15 @@ public class SecuritiesServiceImpl implements SecuritiesService{
         return new SecuritiesPageResponse(
                 securitiesPage
         );
+    }
+
+
+    //переписать запрос на фильтровку сразу в поиске в бд
+    @Override
+    public List<Securities> findSecuritiesByRequest(String request){
+        var securities = securitiesRepository.findAll();
+        return securities.stream().filter((s) -> s.getName().toLowerCase(Locale.ROOT).contains(request.toLowerCase(Locale.ROOT)) ||
+                s.getTicker().toLowerCase(Locale.ROOT).contains(request.toLowerCase(Locale.ROOT))).collect(Collectors.toList()).stream().limit(5).collect(Collectors.toList());
     }
 
     @Override
