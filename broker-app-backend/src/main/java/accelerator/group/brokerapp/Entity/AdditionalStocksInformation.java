@@ -17,7 +17,7 @@ public class AdditionalStocksInformation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "VARCHAR(255)")
+    @Column(name = "id")
     @JsonIgnore
     private long id;
 
@@ -28,7 +28,7 @@ public class AdditionalStocksInformation {
     @JsonIgnore
     private int Lot;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "securities_id")
     private Securities securities;
 

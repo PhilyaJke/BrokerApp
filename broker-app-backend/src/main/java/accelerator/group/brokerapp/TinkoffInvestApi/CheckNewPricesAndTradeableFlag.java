@@ -77,15 +77,15 @@ public class CheckNewPricesAndTradeableFlag{
     @Scheduled(fixedDelay = 2000000)
     protected void updateLastPricesAndGetTradeableFlag() {
         log.info("Проверка цен акций");
-        for (int i = 0; i < 8; i += 1) {
+        for (int i = 1; i < 8; i += 1) {
             var securities = securitiesRepository.findLimitedSecurities(PageRequest.of(i, 299));
             var lastprices = securitiesService.returnInvestApiConnection().getMarketDataService().getLastPricesSync(securities);
             for (ru.tinkoff.piapi.contract.v1.LastPrice lastprice : lastprices) {
-                if (lastprice.getFigi().isEmpty()) {
-                } else {
+                if (!lastprice.getFigi().isEmpty()) {
                     for (int k = 0; k < securities.size(); k++) {
-                        if (securitiesRepository.findSecurityByFigi(lastprice.getFigi()) != null && k >= 6) {
-                            var additionalStocksInformation = additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findSecurityByFigi(lastprice.getFigi()).getId());
+                        if (securitiesRepository.findSecurityByFigi(lastprice.getFigi()) != null) {
+                            var additionalStocksInformation = additionalStocksInformationRepository
+                                    .findAddStocksInfoById(securitiesRepository.findSecurityByFigi(lastprice.getFigi()).getId());
                             additionalStocksInformation.setPrice(Double.valueOf(String.valueOf(lastprice.getPrice().getUnits()).concat(".")
                                     .concat(String.valueOf(lastprice.getPrice().getNano()))));
                             additionalStocksInformationRepository.save(additionalStocksInformation);
