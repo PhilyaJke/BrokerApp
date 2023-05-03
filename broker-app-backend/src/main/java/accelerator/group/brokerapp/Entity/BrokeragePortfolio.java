@@ -26,9 +26,6 @@ public class BrokeragePortfolio {
     @JsonIgnore
     private UUID id;
 
-//    @OneToMany(cascade = CascadeType.PERSIST)
-//    private List<BrokeragePortfolioSecurities> BrokeragePortfolioSecurities;
-
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
     private User user;

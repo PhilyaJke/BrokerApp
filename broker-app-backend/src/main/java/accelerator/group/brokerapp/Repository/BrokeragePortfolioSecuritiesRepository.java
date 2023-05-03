@@ -3,6 +3,7 @@ package accelerator.group.brokerapp.Repository;
 import accelerator.group.brokerapp.Entity.BrokeragePortfolio;
 import accelerator.group.brokerapp.Entity.BrokeragePortfolioSecurities;
 import accelerator.group.brokerapp.Entity.Securities;
+import accelerator.group.brokerapp.Responses.SecuritiesFullInfoResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,5 +17,5 @@ public interface BrokeragePortfolioSecuritiesRepository extends JpaRepository<Br
     BrokeragePortfolioSecurities findPortfolioByUserIdAndSecurityId(@Param(value = "uid") UUID uid, @Param(value = "id") long id);
 
     @Query(name = "FindUsersSecurities", nativeQuery = true)
-    List<Securities> findUsersSecuritiesById(@Param(value = "uid") UUID uid);
+    List<SecuritiesFullInfoResponse> findUsersSecuritiesById(@Param(value = "uid") UUID uid);
 }

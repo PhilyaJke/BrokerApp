@@ -41,6 +41,12 @@ public interface SecuritiesRepository extends JpaRepository<Securities, Long> {
             countName = "CountSecurities")
     List<SecuritiesFullInfoResponse> findAllSecuritiesPage(Pageable pageable);
 
+    @Query(
+            nativeQuery = true,
+            name = "FindUsersSecurities"
+    )
+    SecuritiesFullInfoResponse findUsersSecurities();
+
     @Query(value = "SELECT s FROM Securities s WHERE s.Ticker = ?1")
     Optional<Securities> findByTicker(@Param(value = "ticker") String ticker);
 

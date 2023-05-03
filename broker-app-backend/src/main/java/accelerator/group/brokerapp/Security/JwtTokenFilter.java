@@ -1,7 +1,7 @@
 package accelerator.group.brokerapp.Security;
 
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -14,8 +14,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenFilter extends GenericFilterBean {
@@ -29,26 +27,21 @@ public class JwtTokenFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
         String token = jwtTokenProvider.resolveAccessToken((HttpServletRequest) request);
-//        if(jwtTokenProvider.resolveAccessToken((HttpServletRequest) request).substring(1,6).equals("")) {
-//            String[] req = jwtTokenProvider.resolveAccessToken((HttpServletRequest) request).split(" ");
-//            token = req[1];
-//        }else{
-//            token =
-//        }
 
         try {
-            if (token != null && jwtTokenProvider.validateAccessToken(token)) {
+            if (token != null && jwtTokenProvider.validateToken(token)) {
                 Authentication authentication = jwtTokenProvider.getAuth(token);
                 if (authentication != null) {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         }catch (JwtAuthException exc){
+            exc = new JwtAuthException("JWT TOKEN IS expired or invalid", HttpStatus.UNAUTHORIZED);
             SecurityContextHolder.clearContext();
-            System.out.println("dfkvdflkjnvdflkjnvdklfnv");
             ((HttpServletResponse) response).sendError(exc.getHttpStatus().value());
-            throw new JwtAuthException("JWT TOKEN IS expired or invalid");
+            throw exc;
         }
 
         chain.doFilter(request, response);

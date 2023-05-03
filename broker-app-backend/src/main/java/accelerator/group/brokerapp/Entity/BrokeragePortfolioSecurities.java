@@ -1,5 +1,6 @@
 package accelerator.group.brokerapp.Entity;
 
+import accelerator.group.brokerapp.Responses.SecuritiesFullInfoResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,9 @@ import java.util.List;
         ),
         @NamedNativeQuery(
                 name = "FindUsersSecurities",
-                query = "SELECT s.figi, s.name, s.ticker, s.region, s.sector, s.icon_path FROM securities s WHERE s.id IN (SELECT bps.securities_id FROM brokerage_portfolio_securities bps" +
+                query = "SELECT s.region, asi.price, s.name, s.ticker, s.sector, s.icon_path FROM securities s" +
+                        " INNER JOIN additional_stocks_information asi on s.id = asi.securities_id" +
+                        " WHERE s.id IN (SELECT bps.securities_id FROM brokerage_portfolio_securities bps" +
                         " INNER JOIN brokerage_portfolio bp on bp.id = bps.brokerage_portfolio_id" +
                         " WHERE (cast(bp.user_id as varchar(255)) = cast(?1 as varchar(255))))",
                 resultSetMapping = "Mapping.FindUsersSecurities"
@@ -35,12 +38,12 @@ import java.util.List;
         }),
 
         @SqlResultSetMapping(name="Mapping.FindUsersSecurities",
-        classes = { @ConstructorResult(targetClass = Securities.class,
+        classes = { @ConstructorResult(targetClass = SecuritiesFullInfoResponse.class,
                 columns = {
-                        @ColumnResult(name = "figi", type = String.class),
+                        @ColumnResult(name = "region", type = String.class),
+                        @ColumnResult(name = "price", type = Double.class),
                         @ColumnResult(name = "name", type = String.class),
                         @ColumnResult(name = "ticker", type = String.class),
-                        @ColumnResult(name = "region", type = String.class),
                         @ColumnResult(name = "sector", type = String.class),
                         @ColumnResult(name = "icon_path", type = String.class)
                 })

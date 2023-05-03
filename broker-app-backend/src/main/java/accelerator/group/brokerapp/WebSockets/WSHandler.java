@@ -56,25 +56,29 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
                 figi = findFigiByTicker(session);
             }
 
-            while (session.isOpen()) {
-                Optional<LastPriceOfSecurities> optionalLastPriceOfSecurities = lastPriceOfSecuritiesRepository.findById(figi);
-                if (optionalLastPriceOfSecurities.isPresent()) {
-                    Double productAsString = optionalLastPriceOfSecurities.get().getPrice();
-                    if(!productAsString.equals(actualPrice)){
-                        actualPrice = productAsString;
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.append("price", productAsString);
-                        session.sendMessage(new TextMessage(jsonObject.toString()));
-                    }
-                } else {
-                    Double price = additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findSecurityByFigi(figi).getId()).getPrice();
-                    if(!price.equals(actualPrice)){
-                        actualPrice = price;
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.append("price", price);
-                        session.sendMessage(new TextMessage(jsonObject.toString()));
+            try {
+                while (session.isOpen()) {
+                    Optional<LastPriceOfSecurities> optionalLastPriceOfSecurities = lastPriceOfSecuritiesRepository.findById(figi);
+                    if (optionalLastPriceOfSecurities.isPresent()) {
+                        Double productAsString = optionalLastPriceOfSecurities.get().getPrice();
+                        if (!productAsString.equals(actualPrice)) {
+                            actualPrice = productAsString;
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.append("price", productAsString);
+                            session.sendMessage(new TextMessage(jsonObject.toString()));
+                        }
+                    } else {
+                        Double price = additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findSecurityByFigi(figi).getId()).getPrice();
+                        if (!price.equals(actualPrice)) {
+                            actualPrice = price;
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.append("price", price);
+                            session.sendMessage(new TextMessage(jsonObject.toString()));
+                        }
                     }
                 }
+            }catch (NullPointerException exc){
+                log.info("Ошибка поиска акции в redis");
             }
         }catch (IOException | IllegalStateException exc){
             log.info("Разрыв соединения с uri: {}", session.getUri());

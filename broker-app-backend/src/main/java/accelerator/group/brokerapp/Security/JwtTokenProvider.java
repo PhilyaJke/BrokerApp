@@ -67,21 +67,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public boolean validateAccessToken(String token){
+    public boolean validateToken(String token){
         try {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claimsJws.getBody().getExpiration().before(new Date());
         }catch (JwtException | IllegalArgumentException exc){
             throw new JwtAuthException("Jwt token has expired or taken", HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    public boolean validateRefreshToken(String token){
-        try {
-            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return !claimsJws.getBody().getExpiration().before(new Date());
-        }catch (JwtException | IllegalArgumentException exc){
-            throw new JwtAuthException("Jwt Refresh token has expired", HttpStatus.UNAUTHORIZED);
         }
     }
 

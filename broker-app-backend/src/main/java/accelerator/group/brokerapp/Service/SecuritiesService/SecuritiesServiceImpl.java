@@ -57,7 +57,7 @@ public class SecuritiesServiceImpl implements SecuritiesService{
     }
 
 
-    //переписать запрос на фильтровку сразу в поиске в бд
+    //TODO:переписать запрос на фильтровку сразу в поиске в бд
     @Override
     public List<Securities> findSecuritiesByRequest(String request){
         var securities = securitiesRepository.findAll();

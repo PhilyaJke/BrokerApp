@@ -158,9 +158,10 @@ public class UserRestApi {
     public ResponseEntity userProfile(@RequestHeader(value = "Authorization") String Authorization){
         User user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization)).get();
         log.info("Профиль пользователя - {}", user.getUsername());
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.append("username", user.getUsername());
-        jsonObject.append("securities", brokeragePortfolioSecuritiesRepository.findUsersSecuritiesById(user.getId()));
-        return ResponseEntity.ok(jsonObject.toMap());
+        HashMap<String, Object> map = new HashMap<>();
+//        JSONObject jsonObject = new JSONObject();
+        map.put("username", user.getUsername());
+        map.put("securities", brokeragePortfolioSecuritiesRepository.findUsersSecuritiesById(user.getId()));
+        return ResponseEntity.ok(map);
     }
 }
