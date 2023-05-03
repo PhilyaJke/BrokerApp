@@ -17,12 +17,12 @@ const AppWrapper = styled.div`
   margin: 0 auto;
 `
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(document.getElementsByTagName('app-root')[0]).render(
     //<React.StrictMode>
     <TokenProvider>
         <AuthProvider>
             <ThemeProvider theme={darkTheme}>
-                <GlobalStyle/>
+                <GlobalStyle theme={darkTheme}/>
                 <BrowserRouter>
                     <AppWrapper>
                         <App/>
@@ -33,3 +33,4 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     </TokenProvider>
     //</React.StrictMode>
 )
+
