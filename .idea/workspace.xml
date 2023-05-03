@@ -10,8 +10,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f161ab6c-c43a-4dde-ba0d-f42b6988400b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.8/fileChanges/last-build.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.8/fileHashes/fileHashes.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.8/gc.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/checksums/checksums.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/configuration-cache/gc.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/vcs-1/gc.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,8 +65,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="HTML File" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -111,14 +116,14 @@
     <property name="RequestMappingsPanelWidth1" value="75" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="TODO_SCOPE" value="All Places" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="external.system.task.project.file.to.start" value="$PROJECT_DIR$/broker-app-backend" />
+    <property name="jdk.selected.JAVA_MODULE" value="14" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.12941176" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
@@ -130,26 +135,14 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/broker-app-backend/src/main/jarFile" />
       <recent name="$PROJECT_DIR$/broker-app-backend" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/broker-app-backend/src/main" />
       <recent name="$PROJECT_DIR$/broker-app-backend/src/main/docker" />
     </key>
   </component>
-  <component name="RunManager" selected="Docker.broker-app-backend: Compose Deployment">
-    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="CLASS" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="Spring Boot.BrokerAppApplication (1)">
     <configuration name="/Users/philyaborozdin/Desktop/BrokerApp [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -234,6 +227,13 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
+    <configuration name="BrokerAppApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="BrokerApp.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="accelerator.group.brokerapp.BrokerAppApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="BrokerAppApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="accelerator.group.BrokerApp.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="accelerator.group.brokerapp.BrokerAppApplication" />
@@ -275,13 +275,14 @@
     </configuration>
     <list>
       <item itemvalue="Docker.broker-app-backend: Compose Deployment" />
+      <item itemvalue="Docker.broker-app-backend.server: Compose Deployment" />
       <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp/broker-app-backend [dependencies]" />
       <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp [build]" />
       <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp [clean]" />
       <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp [init]" />
       <item itemvalue="Spring Boot.Unnamed" />
       <item itemvalue="Spring Boot.BrokerAppApplication" />
-      <item itemvalue="Docker.broker-app-backend.server: Compose Deployment" />
+      <item itemvalue="Spring Boot.BrokerAppApplication (1)" />
     </list>
     <recent_temporary>
       <list>
@@ -322,7 +323,21 @@
       <workItem from="1681203399402" duration="2829000" />
       <workItem from="1681223239715" duration="1214000" />
       <workItem from="1681224492215" duration="965000" />
-      <workItem from="1681225503398" duration="8125000" />
+      <workItem from="1681225503398" duration="21754000" />
+      <workItem from="1681462504515" duration="37000" />
+      <workItem from="1681462547723" duration="38000" />
+      <workItem from="1681462597934" duration="98000" />
+      <workItem from="1681462765391" duration="64000" />
+      <workItem from="1681462848918" duration="35000" />
+      <workItem from="1681463009023" duration="14000" />
+      <workItem from="1681482618352" duration="56000" />
+      <workItem from="1681482677245" duration="322000" />
+      <workItem from="1681483004696" duration="1263000" />
+      <workItem from="1681804815837" duration="7923000" />
+      <workItem from="1681915927299" duration="4769000" />
+      <workItem from="1682219959006" duration="54807000" />
+      <workItem from="1682771525761" duration="24857000" />
+      <workItem from="1683128416534" duration="574000" />
     </task>
     <servers />
   </component>
