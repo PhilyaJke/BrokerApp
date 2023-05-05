@@ -9,11 +9,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-public interface BrokeragePortfolioRepository extends JpaRepository<BrokeragePortfolio, UUID>{
+public interface BrokeragePortfolioRepository extends JpaRepository<BrokeragePortfolio, UUID> {
 
-    @Query(name = "FindUsersSecurities", nativeQuery = true)
-    List<Securities> findSecuritiesByUser(@Param(value = "id") UUID id);
+    @Query(name = "FindUserssSecurities", nativeQuery = true)
+    List<Securities> findUsersSecuritiesById(@Param(value = "uid") UUID uid);
 
     @Query(value = "SELECT * FROM brokerage_portfolio b WHERE cast(b.user_id as varchar(255)) = cast(?1 as varchar(255))", nativeQuery = true)
-    BrokeragePortfolio findPortfolioByUserId(@Param(value = "uid") UUID uid);
+    BrokeragePortfolio findPortfolioByUserId(@Param(value = "uuid") UUID uuid);
+
 }

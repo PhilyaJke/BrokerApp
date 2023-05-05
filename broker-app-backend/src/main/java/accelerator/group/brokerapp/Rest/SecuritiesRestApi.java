@@ -81,7 +81,9 @@ public class SecuritiesRestApi {
     }
 
     @GetMapping("/api/securities/list/stock")
-    public ResponseEntity findFullInfo(@RequestParam String ticker){
+    public ResponseEntity findFullInfo(@RequestParam String ticker,
+                                       @RequestHeader(value = "Authorization") String Authorization){
+        Optional<User> user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         var security = securitiesRepository.findByTicker(ticker).get();
         var s = securitiesService.getSecuritiesInfoFromApi(security.getFigi());
@@ -97,8 +99,17 @@ public class SecuritiesRestApi {
             map.put("date", simpleDateFormat.format(Date.from(Instant.ofEpochSecond(historicCandle.getTime().getSeconds()))));
             list.add(map);
         }
+
+        var brokeragePortfolioSecurities = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(user.get().getId(), security.getId());
+        long count;
+        if(brokeragePortfolioSecurities == null){
+            count = 0;
+        }else{
+            count = brokeragePortfolioSecurities.getCount();
+        }
         jsonObject.put("candles", list);
         jsonObject.put("lot", additionalStocksInformationRepository.findAddStocksInfoById(security.getId()).getLot());
+        jsonObject.put("count", count);
         return ResponseEntity.ok(jsonObject.toMap());
     }
 
@@ -140,12 +151,13 @@ public class SecuritiesRestApi {
             var securities = securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get();
             var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(user.get().getId(), securities.getId());
             var subposrtfolio = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get();
+            var count = buySecurityRequest.getValue()*additionalStocksInformationRepository.findAddStocksInfoById(securities.getId()).getLot();
             if(subposrtfolio!=null && subposrtfolio.getCount() > buySecurityRequest.getValue()){
                 subposrtfolio.setCount(
-                        subposrtfolio.getCount()-buySecurityRequest.getValue()*additionalStocksInformationRepository.findAddStocksInfoById(securities.getId()).getLot()
+                        subposrtfolio.getCount()-count
                 );
                 brokeragePortfolioSecuritiesRepository.save(subposrtfolio);
-            }else if(portfolio!=null && subposrtfolio.getCount() == buySecurityRequest.getValue()){
+            }else if(portfolio!=null && subposrtfolio.getCount() == count){
                 brokeragePortfolioSecuritiesRepository.deleteById(subposrtfolio.getId());
             }
             return ResponseEntity.ok(buildJson(buySecurityRequest).toMap());
@@ -153,7 +165,6 @@ public class SecuritiesRestApi {
             return ResponseEntity.notFound().build();
         }
     }
-
 
     public Double parseToDoublePrice(long units, int nano) {
         StringBuilder stringBuilder = new StringBuilder();

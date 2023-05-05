@@ -1,16 +1,13 @@
 package accelerator.group.brokerapp.Rest;
 
 import accelerator.group.brokerapp.Entity.*;
-import accelerator.group.brokerapp.Repository.BrokeragePortfolioRepository;
-import accelerator.group.brokerapp.Repository.BrokeragePortfolioSecuritiesRepository;
-import accelerator.group.brokerapp.Repository.RefreshTokensRepository;
-import accelerator.group.brokerapp.Repository.UserRepository;
+import accelerator.group.brokerapp.Repository.*;
 import accelerator.group.brokerapp.Requests.RegistrationRequest;
 import accelerator.group.brokerapp.Requests.AuthenticationRequest;
+import accelerator.group.brokerapp.Responses.SecuritiesFullInfoResponse;
 import accelerator.group.brokerapp.Security.JwtTokenProvider;
 import accelerator.group.brokerapp.Service.UserService.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +38,7 @@ public class UserRestApi {
     private PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+    private final SecuritiesRepository securitiesRepository;
     private final UserRepository userRepository;
     private final RefreshTokensRepository refreshTokensRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -48,15 +46,19 @@ public class UserRestApi {
     private final UserServiceImpl userService;
     private final BrokeragePortfolioRepository brokeragePortfolioRepository;
     private final BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository;
+    private final AdditionalStocksInformationRepository additionalStocksInformationRepository;
 
     @Autowired
-    public UserRestApi(UserRepository userRepository,
+    public UserRestApi(SecuritiesRepository securitiesRepository,
+                       UserRepository userRepository,
                        RefreshTokensRepository refreshTokensRepository,
                        JwtTokenProvider jwtTokenProvider,
                        AuthenticationManager authenticationManager,
                        UserServiceImpl userService,
                        BrokeragePortfolioRepository brokeragePortfolioRepository,
-                       BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository) {
+                       BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository,
+                       AdditionalStocksInformationRepository additionalStocksInformationRepository) {
+        this.securitiesRepository = securitiesRepository;
         this.userRepository = userRepository;
         this.refreshTokensRepository = refreshTokensRepository;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -64,6 +66,7 @@ public class UserRestApi {
         this.userService = userService;
         this.brokeragePortfolioRepository = brokeragePortfolioRepository;
         this.brokeragePortfolioSecuritiesRepository = brokeragePortfolioSecuritiesRepository;
+        this.additionalStocksInformationRepository = additionalStocksInformationRepository;
     }
 
     @Transactional
@@ -158,10 +161,18 @@ public class UserRestApi {
     public ResponseEntity userProfile(@RequestHeader(value = "Authorization") String Authorization){
         User user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization)).get();
         log.info("Профиль пользователя - {}", user.getUsername());
+        var SecuritiesFullInfo = brokeragePortfolioSecuritiesRepository.findUsersSecuritiesById(user.getId());
+        Double sum = 0.0;
+        for(SecuritiesFullInfoResponse sec: SecuritiesFullInfo) {
+            var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(
+                    userRepository.UserProfileInfo(user.getUsername()).getId(), securitiesRepository.findByTicker(sec.getTicker()).get().getId());
+            var addStockInfo = additionalStocksInformationRepository.findAddStocksInfoById(sec.getId());
+            sum+=brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get().getCount() * addStockInfo.getPrice();
+        }
         HashMap<String, Object> map = new HashMap<>();
-//        JSONObject jsonObject = new JSONObject();
         map.put("username", user.getUsername());
-        map.put("securities", brokeragePortfolioSecuritiesRepository.findUsersSecuritiesById(user.getId()));
+        map.put("budjet", sum);
+        map.put("securities", SecuritiesFullInfo);
         return ResponseEntity.ok(map);
     }
 }

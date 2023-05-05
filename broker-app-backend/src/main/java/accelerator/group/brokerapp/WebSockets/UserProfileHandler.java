@@ -55,7 +55,7 @@ public class UserProfileHandler extends TextWebSocketHandler implements WebSocke
 
         try {
             String username = findFigiByTicker(session);
-            List<Securities> securities = brokeragePortfolioRepository.findSecuritiesByUser(userRepository.UserProfileInfo(username).getId());
+            List<Securities> securities = brokeragePortfolioRepository.findUsersSecuritiesById(userRepository.UserProfileInfo(username).getId());
             while (session.isOpen()) {
 
                 Double price;
@@ -73,7 +73,7 @@ public class UserProfileHandler extends TextWebSocketHandler implements WebSocke
                         Double prices = lastPriceOfSecurities.get().getPrice();
                         var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(
                                 userRepository.UserProfileInfo(username).getId(), securitiesRepository.findSecurityByFigi(security.getFigi()).getId());
-                        price = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get().getCount() * prices * additionalStocksInformation.getLot();
+                        price = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get().getCount() * prices;
                         if(!checkHashMap.containsKey(security.getTicker())) {
                             checkHashMap.put(security.getTicker(), price);
                         }
@@ -81,31 +81,23 @@ public class UserProfileHandler extends TextWebSocketHandler implements WebSocke
                             checkHashMap.remove(security.getTicker());
                             checkHashMap.put(security.getTicker(), price);
                             sum = checkHashMap.values().stream().flatMapToDouble(DoubleStream::of).sum();
-                            hashMap.put(security.getTicker(), price);
-                            jsonObject.append("securitiesPrices", hashMap);
+                            jsonObject.append(security.getTicker(), price);
                             jsonObject.append("summaryPrices", sum);
                             session.sendMessage(new TextMessage(jsonObject.toString()));
                             jsonObject.clear();
-                            hashMap.clear();
                         }
 
                     } else {
                         var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(
                                 userRepository.UserProfileInfo(username).getId(), securitiesRepository.findSecurityByFigi(security.getFigi()).getId());
-                        price = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get().getCount() * additionalStocksInformation.getPrice() * additionalStocksInformation.getLot();
+                        price = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get().getCount() * additionalStocksInformation.getPrice();
                         if(!checkHashMap.containsKey(security.getTicker())) {
                             checkHashMap.put(security.getTicker(), price);
-                        }
-                        if (!checkHashMap.get(security.getTicker()).equals(price)) {
-                            checkHashMap.remove(security.getTicker());
-                            checkHashMap.put(security.getTicker(), price);
-                            Double.sum(sum,price);
-                            hashMap.put(security.getTicker(), price);
-                            jsonObject.append("securitiesPrices", hashMap);
+                            sum = checkHashMap.values().stream().flatMapToDouble(DoubleStream::of).sum();
+                            jsonObject.append(security.getTicker(), price);
                             jsonObject.append("summaryPrices", sum);
                             session.sendMessage(new TextMessage(jsonObject.toString()));
                             jsonObject.clear();
-                            hashMap.clear();
                         }
                     }
                 }
@@ -131,25 +123,4 @@ public class UserProfileHandler extends TextWebSocketHandler implements WebSocke
         String ticker = Arrays.stream(Objects.requireNonNull(session.getUri()).getPath().split("/")).collect(Collectors.toList()).get(2);
         return ticker;
     }
-
-//    public sendMessage(Double actualPrice, Double price, double sum, Securities security, WebSocketSession session) throws IOException {
-//        JSONObject jsonObject = new JSONObject();
-//        Map<String, Object> map = new HashMap<>();
-//        try {
-//            if (!price.equals(actualPrice)) {
-//                actualPrice = price;
-//                Double.sum(sum,price);
-//                map.put(security.getTicker(), price);
-//                jsonObject.append("securitiesPrices", map);
-//                jsonObject.append("summaryPrices", sum);
-//                session.sendMessage(new TextMessage(jsonObject.toString()));
-//            }
-//        }catch (IOException exc){
-//            log.info("Разрыв соединения с uri: {}", session.getUri());
-//            session.close();
-//        }
-//        return jsonObject;
-//    }
-
-
 }

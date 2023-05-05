@@ -1,5 +1,6 @@
 package accelerator.group.brokerapp.Responses;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SecuritiesFullInfoResponse {
 
+    @JsonIgnore
+    private long id;
     private String region;
     private Double price;
     private String name;
