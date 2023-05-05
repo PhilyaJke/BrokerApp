@@ -136,7 +136,7 @@ public class SecuritiesRestApi {
                 );
                 brokeragePortfolioSecuritiesRepository.save(brokeragePortfolioSecurities);
             }
-            return ResponseEntity.ok(buildJson(buySecurityRequest).toMap());
+            return ResponseEntity.ok(buildJson(buySecurityRequest));
         }else{
             return ResponseEntity.notFound().build();
         }
@@ -160,7 +160,7 @@ public class SecuritiesRestApi {
             }else if(portfolio!=null && subposrtfolio.getCount() == count){
                 brokeragePortfolioSecuritiesRepository.deleteById(subposrtfolio.getId());
             }
-            return ResponseEntity.ok(buildJson(buySecurityRequest).toMap());
+            return ResponseEntity.ok(buildJson(buySecurityRequest));
         }else{
             return ResponseEntity.notFound().build();
         }
@@ -178,17 +178,17 @@ public class SecuritiesRestApi {
         return jsonMap.get(key);
     }
 
-    public JSONObject buildJson(BuySecurityRequest buySecurityRequest){
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.append("count", buySecurityRequest.getValue());
+    public HashMap buildJson(BuySecurityRequest buySecurityRequest){
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("count", buySecurityRequest.getValue());
         if(lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).isPresent()) {
-            jsonObject.append("price", lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).get().getPrice());
-            jsonObject.append("sum", lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).get().getPrice() * buySecurityRequest.getValue());
+            hashMap.put("price", lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).get().getPrice());
+            hashMap.put("sum", lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).get().getPrice() * buySecurityRequest.getValue());
         }else{
-            jsonObject.append("price", additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getId()).getPrice());
-            jsonObject.append("sum", additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getId()).getPrice() * buySecurityRequest.getValue());
+            hashMap.put("price", additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getId()).getPrice());
+            hashMap.put("sum", additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getId()).getPrice() * buySecurityRequest.getValue());
         }
-        return jsonObject;
+        return hashMap;
     }
 }
 

@@ -10,18 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f161ab6c-c43a-4dde-ba0d-f42b6988400b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/jarFile/BrokerApp-0.0.1-SNAPSHOT.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Entity/BrokeragePortfolio.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Entity/BrokeragePortfolio.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Entity/BrokeragePortfolioSecurities.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Entity/BrokeragePortfolioSecurities.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Entity/Securities.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Entity/Securities.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Repository/AdditionalStocksInformationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Repository/AdditionalStocksInformationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Repository/BrokeragePortfolioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Repository/BrokeragePortfolioRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Responses/SecuritiesFullInfoResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Responses/SecuritiesFullInfoResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Rest/SecuritiesRestApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Rest/SecuritiesRestApi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Rest/UserRestApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Rest/UserRestApi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/WebSockets/UserProfileHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/WebSockets/UserProfileHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -355,7 +345,7 @@
       <workItem from="1682219959006" duration="54807000" />
       <workItem from="1682771525761" duration="24857000" />
       <workItem from="1683128416534" duration="2041000" />
-      <workItem from="1683133955962" duration="18448000" />
+      <workItem from="1683133955962" duration="18988000" />
     </task>
     <servers />
   </component>
