@@ -12,7 +12,9 @@ const Stock = () => {
     const [priceHistory, setPriceHistory] = useState<IPriceDataList | null>(
         null
     );
-    const { handleRealtimePrice, handlePriceHistory } = useStocks();
+
+    const [displayMessage, setDisplayMessage] = useState<boolean>(false);
+    const { handleRealtimePrice, handlePriceHistory, isLoading } = useStocks();
     const [realtimePrice, setRealtimePrice] = useState<number>(0);
 
     if (!ticker) {
@@ -31,6 +33,16 @@ const Stock = () => {
         handlePriceHistory(priceHistoryRequest).then(setPriceHistory);
     }, [ticker]);
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDisplayMessage(true);
+        }, 1500);
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, []);
+
     const memoizedRealtimePrice = useMemo(() => realtimePrice, [realtimePrice]);
 
     useEffect(() => {
@@ -48,8 +60,14 @@ const Stock = () => {
         };
     }, [ticker, handleRealtimePrice]);
 
-    if (!priceHistory) {
-        return <div>Loading...</div>;
+    if (!displayMessage && (!memoizedRealtimePrice || !priceHistory)) {
+        return <p>загрузка...</p>
+    }
+
+    if (memoizedRealtimePrice === 0 && displayMessage) {
+        return <>
+            <h2>Торги акцией не идут! 💰💰💰</h2>
+            <code>ну или какая-то ошибка... Нет информации о ее цене (не пришла по вебсокету)</code></>
     }
 
     return (

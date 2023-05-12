@@ -2,7 +2,7 @@ import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts"
 import { ICandle, IPriceDataList } from "../../hooks/useStocks/useStocks.model";
 
 interface Props {
-    data: IPriceDataList;
+    data?: IPriceDataList;
 }
 
 export const PriceChart: React.FC<Props> = ({ data }) => {
