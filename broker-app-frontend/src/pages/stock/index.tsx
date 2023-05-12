@@ -8,9 +8,7 @@ import useStockTransactions from "../../hooks/useStockTransactions/useStockTrans
 import {IStockTransaction} from "../../hooks/useStockTransactions/useStockTransactions.model";
 const Stock = () => {
     const navigate = useNavigate();
-    const { handleBuyStock, handleSellStock } = useStockTransactions();
     const { ticker } = useParams<{ ticker: string }>();
-    const [shareQuantity, setShareQuantity] = useState<number>(1);
     const [priceHistory, setPriceHistory] = useState<IPriceDataList | null>(
         null
     );
@@ -54,38 +52,57 @@ const Stock = () => {
         return <div>Loading...</div>;
     }
 
-
-    const handleBuy = () => {
-        throw new Error("Function not implemented.");
-    }
-
-    const handleSell = () => {
-        throw new Error("Function not implemented.");
-    }
     return (
         <div>
             <h1>{ticker}</h1>
             <p>Цена: {memoizedRealtimePrice}</p>
             <PriceChart data={priceHistory} />
-            <Space>
-                <InputNumber
-                    min={1}
-                    value={shareQuantity}
-                    onChange={(value) => setShareQuantity(value as number)}
-                    style={{ width: 80 }}
-                />
-                <p>1 лот = {priceHistory.lot} акций</p>
-                <p>Сумма: {memoizedRealtimePrice * shareQuantity * priceHistory.lot}</p>
-
-                <Button onClick={() => handleBuyStock({ticker: ticker, value: shareQuantity} as IStockTransaction)} type='primary'>
-                    Купить
-                </Button>
-                <Button onClick={() => handleSellStock({ticker: ticker, value: shareQuantity} as IStockTransaction)} type='primary'>
-                    Продать
-                </Button>
-            </Space>
+            <Controls ticker={ticker} realtimePrice={memoizedRealtimePrice} lot={priceHistory.lot}/>
         </div>
     );
 };
+
+
+
+    interface IControls { ticker: string, realtimePrice: number, lot: number }
+const Controls = ({ ticker, realtimePrice, lot }: IControls) => {
+    const [shareQuantity, setShareQuantity] = useState<number>(1);
+    const { handleBuyStock, handleSellStock } = useStockTransactions();
+    // const { handleRealtimePrice, handlePriceHistory } = useStocks();
+    //
+    // const memoizedRealtimePrice = useMemo(() => realtimePrice, [realtimePrice]);
+
+    return (
+        <Space>
+            <InputNumber
+                min={1}
+                value={shareQuantity}
+                onChange={(value) => setShareQuantity(value as number)}
+                style={{ width: 80 }}
+            />
+            <p>1 лот = {lot} акций</p>
+            <p>Сумма: {realtimePrice * shareQuantity * lot}</p>
+
+            <Button
+                onClick={() =>
+                    handleBuyStock({ ticker: ticker, value: shareQuantity } as IStockTransaction)
+                }
+                type="primary"
+            >
+                Купить
+            </Button>
+            <Button
+                onClick={() =>
+                    handleSellStock({ ticker: ticker, value: shareQuantity } as IStockTransaction)
+                }
+                type="primary"
+            >
+                Продать
+            </Button>
+        </Space>
+    );
+};
+
+
 
 export default Stock;

@@ -15,8 +15,5 @@ export const getProfile = async (accessToken: string | null): Promise<IProfile> 
         throw new Error('Failed to get profile');
     }
     const json = await response.json();
-    return {
-        username: json.username,
-        securities: json.securities[0]
-    }
+    return json as IProfile;
 }
