@@ -1,6 +1,6 @@
 import {useAuth} from "../../providers/authProvider/authProvider";
 import {Navigate} from "react-router-dom";
-import {List, message} from "antd";
+import {Card, List, message} from "antd";
 import useProfile from "../../hooks/useProfile/useProfile";
 import {IProfile} from "../../hooks/useProfile/useProfile.model";
 import {useEffect, useState} from "react";
@@ -33,9 +33,10 @@ export const ProfilePage = () => {
                 {
                     profile?.securities.map((security) => (
                         <List.Item key={security.ticker}>
-                            <List.Item.Meta
+                            <Card
                                 title={security.ticker}
-                            />
+                                children={<div style={{display: 'flex', flexDirection: 'column'}}><p>{security.name}</p><p>{security.price}</p></div>}
+                                />
                         </List.Item>
                     ))
                 }
