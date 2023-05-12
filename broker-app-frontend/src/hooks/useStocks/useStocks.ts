@@ -1,6 +1,11 @@
 import {useState} from "react";
-import {getRealtimeStockPrice, getStocks, searchStocksForSuggestion} from "./api";
-import {StocksCardProps, StocksPageProps, StocksPageRequest} from "./useStocks.model";
+import {getRealtimeStockPrice, getStockPriceHistory, getStocks, searchStocksForSuggestion} from "./api";
+import {
+    IPriceHistoryRequest,
+    StocksCardProps,
+    StocksPageProps,
+    StocksPageRequest, IPriceDataList
+} from "./useStocks.model";
 
 
 const useStocks = () => {
@@ -47,7 +52,25 @@ const useStocks = () => {
         return () => {
             ws.close();
         };
+    }
 
+
+    const handlePriceHistory = async (props: IPriceHistoryRequest): Promise<IPriceDataList> => {
+        setIsLoading(true);
+        try {
+            const priceDataList: IPriceDataList = await getStockPriceHistory(props);
+            setIsLoading(false);
+            setIsDown(false)
+            return priceDataList
+        }
+        catch (e) {
+            setIsLoading(false);
+            setIsDown(true);
+            return {
+                lot: 0,
+                candles: []
+            };
+        }
     }
     return {
         isLoading,
@@ -56,6 +79,7 @@ const useStocks = () => {
         handleSearchForSuggestions,
         totalPages,
         handleRealtimePrice,
+        handlePriceHistory
     };
 };
 

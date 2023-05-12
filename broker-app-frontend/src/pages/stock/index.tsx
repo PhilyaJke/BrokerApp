@@ -1,146 +1,91 @@
-import {useCallback, useEffect, useMemo, useState} from "react";
-import { useParams } from "react-router-dom";
-import { PriceDataList } from "../../interfaces/IPriceData";
-import Highcharts from "highcharts";
-import HighchartsReact from "highcharts-react-official";
-import appConfig from "../../../config";
+import { useEffect, useState, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import useStocks from "../../hooks/useStocks/useStocks";
-import React from "react";
-const API_URL = appConfig.URL;
-
-
-const getGraphData = async (ticker: string) => {
-    const fetchData = async () => {
-        const response = await fetch(
-            `${API_URL}/api/securities/list/stock/?ticker=${ticker}`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }
-        ).catch((error) => {
-                console.log(error);
-            }
-        );
-        if (!response) {
-            return null;
-        }
-        const rawData = await response.json();
-        //проблема с тем что дата приходит в формате DD/MM/YYYY и ее нужно правильно спарсить
-        const data: PriceDataList = rawData.map((item: any) => ({
-            low: parseFloat(item.low),
-            high: parseFloat(item.high),
-            close: parseFloat(item.close),
-            open: parseFloat(item.open),
-            date: Date.UTC(
-                parseInt(item.date.split("/")[2]), // year
-                parseInt(item.date.split("/")[1]) - 1, // month (0-indexed)
-                parseInt(item.date.split("/")[0]) // day
-            ),
-        }));
-        return data;
-    }
-    return await fetchData();
-}
-
+import { IPriceDataList, IPriceHistoryRequest } from "../../hooks/useStocks/useStocks.model";
+import { PriceChart } from "../../components/priceChart/PriceChart";
+import { Button, InputNumber, Space } from "antd";
+import useStockTransactions from "../../hooks/useStockTransactions/useStockTransactions";
+import {IStockTransaction} from "../../hooks/useStockTransactions/useStockTransactions.model";
 const Stock = () => {
+    const navigate = useNavigate();
+    const { handleBuyStock, handleSellStock } = useStockTransactions();
     const { ticker } = useParams<{ ticker: string }>();
-    const [data, setData] = useState<PriceDataList | null>(null);
-    const {handleRealtimePrice} = useStocks();
+    const [shareQuantity, setShareQuantity] = useState<number>(1);
+    const [priceHistory, setPriceHistory] = useState<IPriceDataList | null>(
+        null
+    );
+    const { handleRealtimePrice, handlePriceHistory } = useStocks();
     const [realtimePrice, setRealtimePrice] = useState<number>(0);
-    if (!ticker) {
-        return <div>Тикер не указан</div>;
-    }
-    useEffect(() => {
-        getGraphData(ticker).then((data) => {
-            setData(data)
-        }
-        )
-        const close = handleRealtimePrice(ticker, price => {
-            setRealtimePrice(price);
-        });
-        return () => {
-            console.log('WS CLOSED');
-            close();
-        }
-    }, []);
 
-    if (!data) {
+    if (!ticker) {
+        navigate("/");
+        return null;
+    }
+
+    useEffect(() => {
+        const priceHistoryRequest: IPriceHistoryRequest = {
+            ticker: ticker,
+            from: new Date(2021, 0, 1),
+            to: new Date(),
+            interval: "1d",
+        };
+
+        handlePriceHistory(priceHistoryRequest).then(setPriceHistory);
+    }, [ticker]);
+
+    const memoizedRealtimePrice = useMemo(() => realtimePrice, [realtimePrice]);
+
+    useEffect(() => {
+        let close: () => void;
+
+        if (ticker) {
+            close = handleRealtimePrice(ticker, setRealtimePrice);
+        }
+
+        return () => {
+            if (close) {
+                console.log("WS CLOSED");
+                close();
+            }
+        };
+    }, [ticker, handleRealtimePrice]);
+
+    if (!priceHistory) {
         return <div>Loading...</div>;
     }
 
-    // @ts-ignore
-    const options: Highcharts.Options = {
-        title: {
-            text: `${ticker} Price Chart`,
-            style: {
-                color: 'white'
-            }
-        },
-        chart: {
-            backgroundColor: 'rgba(255,255,255,0)',
-            colorCount: '#FFFFFF',
-            width: 700,
-        },
-        xAxis: {
-            type: "datetime",
-            dateTimeLabelFormats: {
-                month: "%b"
-            },
-            zoomEnabled: true,
-            scrollbar: true,
-        },
-        yAxis: {
-            title: {
-                text: "Цена",
-            },
-        },
-        tooltip: {
-            formatter: function () {
-                // @ts-ignore
-                return `<b>${Highcharts.dateFormat('%b %e, %Y', this.x as number)}</b><br/>Цена: ${this.y.toFixed(2)}`;
-            }
-        },
-        rangeSelector: {
-            selected: 1
-        },
-        plotOptions: {
-            line: {
-                cursor: "pointer",
-            },
-        },
-        tooltip: {
-            crosshairs: {
-                width: 1,
-                color: "gray",
-                dashStyle: "solid",
-            },
-            formatter: function () {
-                const date = Highcharts.dateFormat("%d %b %Y", this.x);
-                const price = Highcharts.numberFormat(this.y, 2);
-                return `${date}<br/><b>${price}</b>`;
-            },
-        },
-        series: [
-            {
-                name: "Цена",
-                lineWidth: 1,
-                linecap: 'round',
-                color: "#303cc2",
-                data: data.map((item) => [Number(new Date(item.date)), item.close]), // переводим даты в миллисекунды
-            },
-        ],
-    };
 
+    const handleBuy = () => {
+        throw new Error("Function not implemented.");
+    }
+
+    const handleSell = () => {
+        throw new Error("Function not implemented.");
+    }
     return (
         <div>
             <h1>{ticker}</h1>
-            <p>Цена: {realtimePrice}</p>
-            <HighchartsReact highcharts={Highcharts} options={options} />
+            <p>Цена: {memoizedRealtimePrice}</p>
+            <PriceChart data={priceHistory} />
+            <Space>
+                <InputNumber
+                    min={1}
+                    value={shareQuantity}
+                    onChange={(value) => setShareQuantity(value as number)}
+                    style={{ width: 80 }}
+                />
+                <p>1 лот = {priceHistory.lot} акций</p>
+                <p>Сумма: {memoizedRealtimePrice * shareQuantity * priceHistory.lot}</p>
+
+                <Button onClick={() => handleBuyStock({ticker: ticker, value: shareQuantity} as IStockTransaction)} type='primary'>
+                    Купить
+                </Button>
+                <Button onClick={() => handleSellStock({ticker: ticker, value: shareQuantity} as IStockTransaction)} type='primary'>
+                    Продать
+                </Button>
+            </Space>
         </div>
     );
 };
 
 export default Stock;
-

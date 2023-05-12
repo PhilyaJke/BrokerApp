@@ -1,4 +1,10 @@
-import {StocksCardProps, StocksPageProps, StocksPageRequest} from './useStocks.model';
+import {
+    IPriceDataList,
+    IPriceHistoryRequest,
+    StocksCardProps,
+    StocksPageProps,
+    StocksPageRequest
+} from './useStocks.model';
 
 
 import appConfig from "../../../config";
@@ -67,18 +73,29 @@ export const getRealtimeStockPrice = (ticker: string, callback: (price: number) 
     const ws = new WebSocket(`${WS_URL}/price/${ticker}`);
     console.log('NEW WS CONNECTION', ticker);
     ws.onmessage = (event: MessageEvent) => {
-        // console.log('non decoded', event.data);
         const { price } = JSON.parse(event.data);
         callback(price[0]);
     };
-
-    
-    // ws.onerror = (event: Event) => {
-    //     console.log('ws.onerror', event);
-    // };
-
     return ws;
 };
+
+
+export const getStockPriceHistory = async (props: IPriceHistoryRequest): Promise<IPriceDataList> => {
+    const {ticker, from, to, interval} = props;
+        const response = await fetch(
+            `${API_URL}/api/securities/list/stock/?ticker=${ticker}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        if (!response.ok) {
+            throw new Error("Failed to get stock price history");
+        }
+        return response.json();
+}
 
 
 

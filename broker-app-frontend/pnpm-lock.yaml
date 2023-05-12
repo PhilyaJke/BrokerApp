@@ -10,6 +10,12 @@ dependencies:
   formik:
     specifier: ^2.2.9
     version: 2.2.9(react@18.2.0)
+  highcharts:
+    specifier: ^10.3.3
+    version: 10.3.3
+  highcharts-react-official:
+    specifier: ^3.2.0
+    version: 3.2.0(highcharts@10.3.3)(react@18.2.0)
   jwt-decode:
     specifier: ^3.1.2
     version: 3.1.2
@@ -4735,7 +4741,7 @@ packages:
     resolution: {integrity: sha512-oWb1Z6mkHIskLzEJ/XWX0srkpkTQ7vaopMQkyaEIoq0fmtFVxOthb8cCxeT+p3ynTdkk/RZwbgG4brR5BeWECw==}
     engines: {node: '>= 4.0'}
     os: [darwin]
-    deprecated: fsevents 1 will break on node v14+ and could be using insecure binaries. Upgrade to fsevents 2.
+    deprecated: The v1 package contains DANGEROUS / INSECURE binaries. Upgrade to safe fsevents v2
     requiresBuild: true
     dependencies:
       bindings: 1.5.0
@@ -4992,6 +4998,20 @@ packages:
     dependencies:
       inherits: 2.0.4
       minimalistic-assert: 1.0.1
+    dev: false
+
+  /highcharts-react-official@3.2.0(highcharts@10.3.3)(react@18.2.0):
+    resolution: {integrity: sha512-71IJZsLmEboYFjONpwC3NRsg6JKvtKYtS5Si3e6s6MLRSOFNOY8KILTkzvO36kjpeR/A0X3/kvvewE+GMPpkjw==}
+    peerDependencies:
+      highcharts: '>=6.0.0'
+      react: '>=16.8.0'
+    dependencies:
+      highcharts: 10.3.3
+      react: 18.2.0
+    dev: false
+
+  /highcharts@10.3.3:
+    resolution: {integrity: sha512-r7wgUPQI9tr3jFDn3XT36qsNwEIZYcfgz4mkKEA6E4nn5p86y+u1EZjazIG4TRkl5/gmGRtkBUiZW81g029RIw==}
     dev: false
 
   /hmac-drbg@1.0.1:

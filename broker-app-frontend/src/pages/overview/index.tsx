@@ -20,11 +20,11 @@ const EndOfStocks = () => {
 };
 
 
-const StocksCard = memo(({ticker, name, region, sector, price, icon_path}: StocksCardProps) => {
+const StocksCard = memo(({ticker, name, region, sector, price, iconPath}: StocksCardProps) => {
     const navigate = useNavigate();
     return (
         <Card title={ticker} style={{width: 300}} onClick={() => navigate(`/quote/${ticker}`)}>
-            <img src={icon_path} style={{width: 50, height: 50}} alt={''}/>
+            <img src={iconPath} style={{width: 50, height: 50}} alt={''}/>
             <p><b>{name}</b></p>
             <p>{region}</p>
             <p>{sector}</p>
@@ -65,7 +65,7 @@ const OverviewPage = () => {
             return {
                 value: stock.ticker,
                 label: (<div style={{display:'flex', justifyContent:'start', alignItems: 'center', gap: '8px'}} onClick={() => navigate(`/quote/${stock.ticker}`)}>
-                    <img style={{width: 32, height: 32}} src={stock.icon_path}/>
+                    <img style={{width: 32, height: 32}} src={stock.iconPath}/>
                     <div style={{display: 'flex', flexDirection: 'column'}}>
                         <span><code>{stock.ticker}</code></span>
                         <span><b>{stock.name}</b></span>
