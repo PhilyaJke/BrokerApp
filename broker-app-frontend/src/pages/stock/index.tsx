@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import useStocks from "../../hooks/useStocks/useStocks";
 import { IPriceDataList, IPriceHistoryRequest } from "../../hooks/useStocks/useStocks.model";
 import { PriceChart } from "../../components/priceChart/PriceChart";
-import { Button, InputNumber, Space } from "antd";
+import {Button, InputNumber, message, Space} from "antd";
 import useStockTransactions from "../../hooks/useStockTransactions/useStockTransactions";
 import {IStockTransaction} from "../../hooks/useStockTransactions/useStockTransactions.model";
 const Stock = () => {
@@ -57,7 +57,7 @@ const Stock = () => {
             <h1>{ticker}</h1>
             <p>Цена: {memoizedRealtimePrice}</p>
             <PriceChart data={priceHistory} />
-            <Controls ticker={ticker} realtimePrice={memoizedRealtimePrice} lot={priceHistory.lot}/>
+            <Controls ticker={ticker} realtimePrice={memoizedRealtimePrice} lot={priceHistory.lot || 1}/>
         </div>
     );
 };
@@ -71,6 +71,17 @@ const Controls = ({ ticker, realtimePrice, lot }: IControls) => {
     // const { handleRealtimePrice, handlePriceHistory } = useStocks();
     //
     // const memoizedRealtimePrice = useMemo(() => realtimePrice, [realtimePrice]);
+    const butStocks = (props: IStockTransaction) => {
+        message.success('Куплено!');
+        setShareQuantity(0);
+        handleBuyStock(props);
+    }
+
+    const sellStocks = (props: IStockTransaction) => {
+        message.success('Продано!');
+        setShareQuantity(0);
+        handleSellStock(props);
+    }
 
     return (
         <Space>
@@ -85,7 +96,7 @@ const Controls = ({ ticker, realtimePrice, lot }: IControls) => {
 
             <Button
                 onClick={() =>
-                    handleBuyStock({ ticker: ticker, value: shareQuantity } as IStockTransaction)
+                    butStocks({ ticker: ticker, value: shareQuantity } as IStockTransaction)
                 }
                 type="primary"
             >
@@ -93,7 +104,7 @@ const Controls = ({ ticker, realtimePrice, lot }: IControls) => {
             </Button>
             <Button
                 onClick={() =>
-                    handleSellStock({ ticker: ticker, value: shareQuantity } as IStockTransaction)
+                    sellStocks({ ticker: ticker, value: shareQuantity } as IStockTransaction)
                 }
                 type="primary"
             >
