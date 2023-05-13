@@ -4,6 +4,7 @@ import accelerator.group.brokerapp.Entity.LastPriceOfSecurities;
 import accelerator.group.brokerapp.Repository.LastPriceOfSecuritiesRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
 import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
+import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
@@ -79,16 +80,16 @@ public class CacheableLastPrices{
             };
             Consumer<Throwable> onErrorCallback = Throwable::printStackTrace;
 
-            securitiesService.returnInvestApiConnection().getMarketDataStreamService().newStream("info_stream", processor, onErrorCallback).subscribeLastPrices(securitiesRepository.findLimitedSecurities(PageRequest.of(1, 299)));
-
-            for (int i = 2; i < 5; i += 1) {
+            for (int i = 1; i < 5; i += 1) {
                 securitiesService.returnInvestApiConnection().getMarketDataStreamService().newStream("new_stream", processor, onErrorCallback).subscribeLastPrices(securitiesRepository.findLimitedSecurities(PageRequest.of(i, 299)));
             }
 
-        }catch (ApiRuntimeException exc){
+        }catch (ApiRuntimeException | StatusRuntimeException exc){
             log.info("Какая-то ошибка тинькофф банка. Callback");
+            SecuritiesStreamInfo();
         }
     }
+
     public Double parseToDoublePrice(long units, int nano){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(units).append(nano).insert(String.valueOf(units).length(), ".");

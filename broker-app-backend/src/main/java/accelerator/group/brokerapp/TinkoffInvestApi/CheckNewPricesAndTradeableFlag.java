@@ -5,6 +5,11 @@ import accelerator.group.brokerapp.Entity.Securities;
 import accelerator.group.brokerapp.Repository.AdditionalStocksInformationRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
 import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
+import com.amazonaws.SdkClientException;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,11 +24,13 @@ import ru.tinkoff.piapi.contract.v1.Share;
 
 import ru.tinkoff.piapi.core.exception.ApiRuntimeException;
 
+import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 @Component
 @EnableScheduling
-@Slf4j
 public class CheckNewPricesAndTradeableFlag{
 
     private final SecuritiesRepository securitiesRepository;
@@ -39,27 +46,42 @@ public class CheckNewPricesAndTradeableFlag{
         this.additionalStocksInformationRepository = additionalStocksInformationRepository;
     }
 
-//Обновить и сделать автоматическое добавление иконок
     @Async
     @Transactional
-    @Scheduled(fixedDelay = 10000000l)
+    @Scheduled(fixedDelay = 1000000L)
     protected void addNewSecurities() {
         log.info("Проверка на наличие новых акций");
+        String sl = null;
         try {
             List<Share> shares = securitiesService.returnInvestApiConnection().getInstrumentsService().getTradableSharesSync();
-            for (int i = 0; i < shares.size(); i++) {
-                if (!securitiesRepository.findAllFigiSecurities().contains(shares.get(i).getFigi())) {
+            for (Share share : shares) {
+                if (!securitiesRepository.findAllFigiSecurities().contains(share.getFigi())) {
+                    var listFiles = new File("/Users/philyaborozdin/Desktop/icons").listFiles();
+                    for(int i = 0; i < Objects.requireNonNull(listFiles).length; i++){
+                        try {
+                            if(listFiles[i].getName().substring(0, listFiles[i].getName().length()-3).equals(share.getTicker())) {
+                                var s = getAwsCredentials().getObject("securitiesicons", listFiles[i].getName().substring(0, listFiles[i].getName().length() - 3));
+                                if (s != null) {
+                                    sl = s.getObjectContent().getHttpRequest().getURI().toString();
+                                    break;
+                                }
+                            }
+                        }catch (SdkClientException ignored){
+
+                        }
+                    }
 
                     Securities securities = new Securities(
-                            shares.get(i).getFigi(),
-                            shares.get(i).getName(),
-                            shares.get(i).getTicker(),
-                            shares.get(i).getCountryOfRisk(),
-                            shares.get(i).getSector()
+                            share.getFigi(),
+                            share.getName(),
+                            share.getTicker(),
+                            share.getCountryOfRisk(),
+                            share.getSector(),
+                            sl
                     );
 
                     AdditionalStocksInformation additionalStocksInformation = new AdditionalStocksInformation(
-                            shares.get(i).getLot(),
+                            share.getLot(),
                             securities
                     );
 
@@ -74,7 +96,7 @@ public class CheckNewPricesAndTradeableFlag{
     }
 
     @Async
-    @Scheduled(fixedDelay = 2000000)
+    @Scheduled(fixedDelay = 2000000L)
     protected void updateLastPricesAndGetTradeableFlag() {
         log.info("Проверка цен акций");
         for (int i = 1; i < 8; i += 1) {
@@ -86,8 +108,7 @@ public class CheckNewPricesAndTradeableFlag{
                         if (securitiesRepository.findSecurityByFigi(lastprice.getFigi()) != null) {
                             var additionalStocksInformation = additionalStocksInformationRepository
                                     .findAddStocksInfoById(securitiesRepository.findSecurityByFigi(lastprice.getFigi()).getId());
-                            additionalStocksInformation.setPrice(Double.valueOf(String.valueOf(lastprice.getPrice().getUnits()).concat(".")
-                                    .concat(String.valueOf(lastprice.getPrice().getNano()))));
+                            additionalStocksInformation.setPrice(parseToDoublePrice(lastprice.getPrice().getUnits(), lastprice.getPrice().getNano()));
                             additionalStocksInformationRepository.save(additionalStocksInformation);
                             break;
                         }
@@ -96,6 +117,36 @@ public class CheckNewPricesAndTradeableFlag{
             }
         }
         log.info("Конец проверки цен акций");
+    }
+
+    public AmazonS3 getAwsCredentials(){
+
+        AWSCredentials awsCredentials = new AWSCredentials(){
+            @Override
+            public String getAWSAccessKeyId() {
+                return "YCAJEsTENnTdsKsgUimR5RBMO";
+            }
+
+            @Override
+            public String getAWSSecretKey() {
+                return "YCPMp-e69gbk6szjYV_NIfWDfqqxqS6u8Ah2WNXT";
+            }
+        };
+
+        return AmazonS3ClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .withEndpointConfiguration(
+                        new AmazonS3ClientBuilder.EndpointConfiguration(
+                                "storage.yandexcloud.net","ru-central1"
+                        )
+                )
+                .build();
+    }
+
+    public Double parseToDoublePrice(long units, int nano){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(units).append(nano).insert(String.valueOf(units).length(), ".");
+        return Double.valueOf(String.valueOf(stringBuilder));
     }
 
 }

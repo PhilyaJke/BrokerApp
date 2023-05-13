@@ -35,7 +35,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers( "/api/auth/**", "/api/securities/list/**", "/price", "/price/{ticker}",
                         "/profile", "/profile/{username}", "/getprice", "/getprice/{address}", "/api/buySecurity",
-                        "/api/profile", "/api/sellSecurity", "/api/buySecurity").permitAll()
+                        "/api/profile", "/api/sellSecurity", "/api/buySecurity", "/api/securities/list/stock").permitAll()
                 .antMatchers("/api/auth/logout", "/api/auth/updateaccesstoken").authenticated()
                 .anyRequest().authenticated()
                 .and()

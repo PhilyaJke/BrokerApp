@@ -45,16 +45,15 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
 
             log.info("Запрос на соединение с uri: {}", session.getUri());
 
-            if(!uriSet.stream().filter(x -> x.getUri().equals(session.getUri())).findAny().isPresent()){
+            if(!uriSet.stream().anyMatch(x -> x.getUri().equals(session.getUri()))){
                 uriSet.add(session);
-                figi = findFigiByTicker(session);
             }else{
                 log.info("Разрыв соединеия с предыдущим коннектом по uri: {}", session.getUri());
                 uriSet.stream().filter(x -> x.getUri().equals(session.getUri())).findAny().get().close();
                 uriSet.add(session);
                 uriSet.remove(uriSet.stream().filter(x -> x.getUri().equals(session.getUri())).findAny().get());
-                figi = findFigiByTicker(session);
             }
+            figi = findFigiByTicker(session);
 
             try {
                 while (session.isOpen()) {
@@ -101,7 +100,7 @@ public class WSHandler extends TextWebSocketHandler implements WebSocketHandler 
     public String findFigiByTicker(WebSocketSession session){
         String ticker = Arrays.stream(Objects.requireNonNull(session.getUri()).getPath().split("/")).collect(Collectors.toList()).get(2);
         Optional<String> figi = securitiesRepository.findFigiByTicker(ticker);
-        return figi.orElse(null);
+        return figi.get();
     }
 
 }

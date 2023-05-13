@@ -81,9 +81,9 @@ public class SecuritiesRestApi {
     }
 
     @GetMapping("/api/securities/list/stock")
-    public ResponseEntity findFullInfo(@RequestParam String ticker,
-                                       @RequestHeader(value = "Authorization") String Authorization){
-        Optional<User> user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization));
+    public ResponseEntity findFullInfo(@RequestParam String ticker){
+        log.info("Запрос на информацию об акции - {}", ticker);
+//        Optional<User> user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         var security = securitiesRepository.findByTicker(ticker).get();
         var s = securitiesService.getSecuritiesInfoFromApi(security.getFigi());
@@ -100,16 +100,16 @@ public class SecuritiesRestApi {
             list.add(map);
         }
 
-        var brokeragePortfolioSecurities = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(user.get().getId(), security.getId());
-        long count;
-        if(brokeragePortfolioSecurities == null){
-            count = 0;
-        }else{
-            count = brokeragePortfolioSecurities.getCount();
-        }
+//        var brokeragePortfolioSecurities = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(user.get().getId(), security.getId());
+//        long count;
+//        if(brokeragePortfolioSecurities == null){
+//            count = 0;
+//        }else{
+//            count = brokeragePortfolioSecurities.getCount();
+//        }
         jsonObject.put("candles", list);
         jsonObject.put("lot", additionalStocksInformationRepository.findAddStocksInfoById(security.getId()).getLot());
-        jsonObject.put("count", count);
+//        jsonObject.put("count", count);
         return ResponseEntity.ok(jsonObject.toMap());
     }
 
