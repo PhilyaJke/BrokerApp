@@ -80,7 +80,7 @@ export const getRealtimeStockPrice = (ticker: string, callback: (price: number) 
 };
 
 
-export const getStockPriceHistory = async (props: IPriceHistoryRequest): Promise<IPriceDataList> => {
+export const getStockPriceHistory = async (props: IPriceHistoryRequest, accessToken: string | null): Promise<IPriceDataList> => {
     const {ticker, from, to, interval} = props;
         const response = await fetch(
             `${API_URL}/api/securities/list/stock/?ticker=${ticker}`,
@@ -88,6 +88,7 @@ export const getStockPriceHistory = async (props: IPriceHistoryRequest): Promise
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    'Authorization': `${accessToken}`
                 },
             }
         );

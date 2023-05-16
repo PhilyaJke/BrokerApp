@@ -6,13 +6,14 @@ import {
     StocksPageProps,
     StocksPageRequest, IPriceDataList
 } from "./useStocks.model";
+import {useTokens} from "../../providers/authProvider/authProvider";
 
 
 const useStocks = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isDown, setIsDown] = useState<boolean>(false);
     const [totalPages, setTotalPages] = useState<number>(1);
-
+    const {accessToken} = useTokens();
 
     const handleStocks = async (props: StocksPageRequest): Promise<StocksCardProps[]> => {
         setIsLoading(true);
@@ -58,7 +59,7 @@ const useStocks = () => {
     const handlePriceHistory = async (props: IPriceHistoryRequest): Promise<IPriceDataList> => {
         setIsLoading(true);
         try {
-            const priceDataList: IPriceDataList = await getStockPriceHistory(props);
+            const priceDataList: IPriceDataList = await getStockPriceHistory(props, accessToken);
             setIsLoading(false);
             setIsDown(false)
             return priceDataList
