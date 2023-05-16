@@ -74,8 +74,8 @@ const Stock = () => {
         <div>
             <h1>{ticker}</h1>
             <p>Цена: {memoizedRealtimePrice}</p>
-            <PriceChart data={priceHistory} />
-            <Controls ticker={ticker} realtimePrice={memoizedRealtimePrice} lot={priceHistory.lot || 1}/>
+            {priceHistory && <PriceChart data={priceHistory} />}
+            <Controls ticker={ticker} realtimePrice={memoizedRealtimePrice} lot={priceHistory?.lot || 1}/>
         </div>
     );
 };

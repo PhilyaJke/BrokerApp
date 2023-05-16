@@ -4,7 +4,9 @@ import {Card, List, message} from "antd";
 import useProfile from "../../hooks/useProfile/useProfile";
 import {IProfile} from "../../hooks/useProfile/useProfile.model";
 import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 export const ProfilePage = () => {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState<IProfile | null>(null);
     const {logout} = useAuth();
     const {handleMyProfile, isLoading, error} = useProfile();
@@ -29,18 +31,19 @@ export const ProfilePage = () => {
             <h1>Профиль</h1>
             <p>Имя: {profile?.username}</p>
             <p>Бюджет: {profile?.budjet}</p>
-            <List itemLayout="horizontal">
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
                 {
                     profile?.securities.map((security) => (
-                        <List.Item key={security.ticker}>
-                            <Card
-                                title={security.ticker}
-                                children={<div style={{display: 'flex', flexDirection: 'column'}}><p>{security.name}</p><p>{security.price}</p></div>}
-                                />
-                        </List.Item>
+                        <Card title={security.ticker} style={{width: 300}} onClick={() => navigate(`/quote/${security.ticker}`)}>
+                            <img src={security.iconPath} style={{width: 50, height: 50}} alt={''}/>
+                            <p><b>{security.name}</b></p>
+                            <p>{security.region}</p>
+                            <p>{security.sector}</p>
+                            <p>{String(security.price)}$</p>
+                        </Card>
                     ))
                 }
-            </List>
+            </div>
             <button onClick={handleLogout}>Выйти</button>
         </div>
     );
