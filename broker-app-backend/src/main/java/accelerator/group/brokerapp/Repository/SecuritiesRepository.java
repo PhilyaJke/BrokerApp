@@ -48,7 +48,7 @@ public interface SecuritiesRepository extends JpaRepository<Securities, Long> {
     SecuritiesFullInfoResponse findUsersSecurities();
 
     @Query(value = "SELECT s FROM Securities s WHERE s.Ticker = ?1")
-    Optional<Securities> findByTicker(@Param(value = "ticker") String ticker);
+    Optional<Securities> findSecuritiesByTicker(@Param(value = "ticker") String ticker);
 
     @Query(value = "SELECT s.Figi FROM Securities s WHERE s.Ticker = ?1")
     Optional<String> findFigiByTicker(@Param(value = "ticker") String ticker);

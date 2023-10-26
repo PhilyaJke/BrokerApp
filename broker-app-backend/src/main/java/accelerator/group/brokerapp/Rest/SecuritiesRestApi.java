@@ -1,11 +1,14 @@
 package accelerator.group.brokerapp.Rest;
 
-import accelerator.group.brokerapp.Entity.BrokeragePortfolioSecurities;
 import accelerator.group.brokerapp.Entity.User;
 import accelerator.group.brokerapp.Repository.*;
 import accelerator.group.brokerapp.Requests.BuySecurityRequest;
 import accelerator.group.brokerapp.Security.JwtTokenProvider;
-import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.AdditionalStocksInformationService.AdditionalStocksInformationMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.BrokeragePortfolioSecuritiesService.BrokeragePortfolioSecuritiesMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.BrokeragePortfolioService.BrokeragePortfolioMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.LastPriceOfSecurityService.LastPriceOfSecurityMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.SecuritiesService.SecuritiesMVCServiceImpl;
 import com.owlike.genson.Genson;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -23,32 +26,29 @@ import java.util.*;
 @CrossOrigin(origins = "http://localhost:5173")
 public class SecuritiesRestApi {
 
-    private final SecuritiesServiceImpl securitiesService;
-    private final SecuritiesRepository securitiesRepository;
+    private final SecuritiesMVCServiceImpl securitiesMVCService;
+    private final BrokeragePortfolioSecuritiesMVCServiceImpl brokeragePortfolioSecuritiesMVCService;
+    private final AdditionalStocksInformationMVCServiceImpl additionalStocksInformationMVCService;
+    private final BrokeragePortfolioMVCServiceImpl brokeragePortfolioMVCService;
+    private final LastPriceOfSecurityMVCServiceImpl lastPriceOfSecurityMVCService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
-    private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
-    private final BrokeragePortfolioRepository brokeragePortfolioRepository;
-    private final BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository;
-    private final AdditionalStocksInformationRepository additionalStocksInformationRepository;
 
     @Autowired
-    public SecuritiesRestApi(SecuritiesServiceImpl securitiesService,
-                             SecuritiesRepository securitiesRepository,
+    public SecuritiesRestApi(SecuritiesMVCServiceImpl securitiesMVCService,
+                             BrokeragePortfolioSecuritiesMVCServiceImpl brokeragePortfolioSecuritiesMVCService,
+                             AdditionalStocksInformationMVCServiceImpl additionalStocksInformationMVCService,
+                             BrokeragePortfolioMVCServiceImpl brokeragePortfolioMVCService,
+                             LastPriceOfSecurityMVCServiceImpl lastPriceOfSecurityMVCService,
                              JwtTokenProvider jwtTokenProvider,
-                             UserRepository userRepository,
-                             LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository,
-                             BrokeragePortfolioRepository brokeragePortfolioRepository,
-                             BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository,
-                             AdditionalStocksInformationRepository additionalStocksInformationRepository) {
-        this.securitiesService = securitiesService;
-        this.securitiesRepository = securitiesRepository;
+                             UserRepository userRepository) {
+        this.securitiesMVCService = securitiesMVCService;
+        this.brokeragePortfolioSecuritiesMVCService = brokeragePortfolioSecuritiesMVCService;
+        this.additionalStocksInformationMVCService = additionalStocksInformationMVCService;
+        this.brokeragePortfolioMVCService = brokeragePortfolioMVCService;
+        this.lastPriceOfSecurityMVCService = lastPriceOfSecurityMVCService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
-        this.lastPriceOfSecuritiesRepository = lastPriceOfSecuritiesRepository;
-        this.brokeragePortfolioRepository = brokeragePortfolioRepository;
-        this.brokeragePortfolioSecuritiesRepository = brokeragePortfolioSecuritiesRepository;
-        this.additionalStocksInformationRepository = additionalStocksInformationRepository;
     }
 
     @GetMapping("/api/securities/list/securities")
@@ -59,15 +59,15 @@ public class SecuritiesRestApi {
         switch (region){
             case "all" -> {
                 log.info("Пришел запрос на все акции");
-                return ResponseEntity.ok(securitiesService.findAllSecuritiesPage(PageRequest.of(page, size)));
+                return ResponseEntity.ok(securitiesMVCService.findAllSecuritiesPage(PageRequest.of(page, size)));
             }
             case "foreign" ->{
                 log.info("Пришел запрос на все иностранные акции");
-                return ResponseEntity.ok(securitiesService.findAllForeignSecuritiesPage(PageRequest.of(page, size)));
+                return ResponseEntity.ok(securitiesMVCService.findAllForeignSecuritiesPage(PageRequest.of(page, size)));
             }
             default -> {
                 log.info("Пришел запрос на все российские акции");
-                return ResponseEntity.ok(securitiesService.findAllRuSecuritiesPage(PageRequest.of(page, size)));
+                return ResponseEntity.ok(securitiesMVCService.findAllRuSecuritiesPage(PageRequest.of(page, size)));
             }
         }
     }
@@ -76,7 +76,7 @@ public class SecuritiesRestApi {
     public ResponseEntity findSecuritiesInSearch(@RequestBody String search){
         log.info("поиск по акциям");
         String request = decodeJson(search, "search");
-        var securities = securitiesService.findSecuritiesByRequest(request);
+        var securities = securitiesMVCService.findSecuritiesByRequest(request);
         return securities.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(securities);
     }
 
@@ -85,11 +85,10 @@ public class SecuritiesRestApi {
         log.info("Запрос на информацию об акции - {}", ticker);
 //        Optional<User> user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        var security = securitiesRepository.findByTicker(ticker).get();
-        var s = securitiesService.getSecuritiesInfoFromApi(security.getFigi());
+        var securitiesCandles = securitiesMVCService.getSecuritiesInfoFromApiByTicker(ticker);
         JSONObject jsonObject = new JSONObject();
         List<Map<String, Object>> list = new ArrayList<>();
-        for (ru.tinkoff.piapi.contract.v1.HistoricCandle historicCandle : s) {
+        for (ru.tinkoff.piapi.contract.v1.HistoricCandle historicCandle : securitiesCandles) {
             parseToDoublePrice(historicCandle.getHigh().getUnits(), historicCandle.getHigh().getNano());
             Map<String, Object> map = new HashMap();
             map.put("high", parseToDoublePrice(historicCandle.getHigh().getUnits(), historicCandle.getHigh().getNano()));
@@ -108,7 +107,7 @@ public class SecuritiesRestApi {
 //            count = brokeragePortfolioSecurities.getCount();
 //        }
         jsonObject.put("candles", list);
-        jsonObject.put("lot", additionalStocksInformationRepository.findAddStocksInfoById(security.getId()).getLot());
+        jsonObject.put("lot", additionalStocksInformationMVCService.getLotOfSecurity(ticker));
 //        jsonObject.put("count", count);
         return ResponseEntity.ok(jsonObject.toMap());
     }
@@ -119,28 +118,17 @@ public class SecuritiesRestApi {
         log.info("Покупка акций - {}", buySecurityRequest.getTicker());
         Optional<User> user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization));
         if(user.isPresent()){
-            var securities = securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get();
-            var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(user.get().getId(), securities.getId());
+            var portfolio = brokeragePortfolioSecuritiesMVCService.findPortfolioByUserIdAndTicker(user.get().getId() ,buySecurityRequest.getTicker());
             if(portfolio != null) {
-                var subposrtfolio = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get();
-                subposrtfolio.setCount(
-                        subposrtfolio.getCount()+buySecurityRequest.getValue()*additionalStocksInformationRepository.findAddStocksInfoById(securities.getId()).getLot()
-                );
-                brokeragePortfolioSecuritiesRepository.save(subposrtfolio);
+                brokeragePortfolioSecuritiesMVCService.addPurchaseOfSecurityToPortfolio(portfolio.getId(), buySecurityRequest);
             }else{
-                var brokeragePortfolio = brokeragePortfolioRepository.findPortfolioByUserId(user.get().getId());
-                BrokeragePortfolioSecurities brokeragePortfolioSecurities = new BrokeragePortfolioSecurities(
-                        securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get(),
-                        brokeragePortfolio,
-                        buySecurityRequest.getValue()*additionalStocksInformationRepository.findAddStocksInfoById(securities.getId()).getLot()
-                );
-                brokeragePortfolioSecuritiesRepository.save(brokeragePortfolioSecurities);
+                brokeragePortfolioSecuritiesMVCService.createPortfolioAndAddPurchaseOfSecurity(user.get().getId(), buySecurityRequest);
             }
             return ResponseEntity.ok(buildJson(buySecurityRequest));
         }else{
             return ResponseEntity.notFound().build();
         }
-    }
+    }    
 
     @PostMapping("/api/sellSecurity")
     public ResponseEntity sellSecurity(@RequestBody BuySecurityRequest buySecurityRequest,
@@ -148,18 +136,7 @@ public class SecuritiesRestApi {
         log.info("Продажа акций - {}", buySecurityRequest.getTicker());
         Optional<User> user = userRepository.findByUsername(jwtTokenProvider.getUsername(Authorization));
         if(user.isPresent()) {
-            var securities = securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get();
-            var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(user.get().getId(), securities.getId());
-            var subposrtfolio = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get();
-            var count = buySecurityRequest.getValue()*additionalStocksInformationRepository.findAddStocksInfoById(securities.getId()).getLot();
-            if(subposrtfolio!=null && subposrtfolio.getCount() > buySecurityRequest.getValue()){
-                subposrtfolio.setCount(
-                        subposrtfolio.getCount()-count
-                );
-                brokeragePortfolioSecuritiesRepository.save(subposrtfolio);
-            }else if(portfolio!=null && subposrtfolio.getCount() == count){
-                brokeragePortfolioSecuritiesRepository.deleteById(subposrtfolio.getId());
-            }
+           brokeragePortfolioSecuritiesMVCService.sellSecurities(user.get().getId(), buySecurityRequest);
             return ResponseEntity.ok(buildJson(buySecurityRequest));
         }else{
             return ResponseEntity.notFound().build();
@@ -181,12 +158,12 @@ public class SecuritiesRestApi {
     public HashMap buildJson(BuySecurityRequest buySecurityRequest){
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("count", buySecurityRequest.getValue());
-        if(lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).isPresent()) {
-            hashMap.put("price", lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).get().getPrice());
-            hashMap.put("sum", lastPriceOfSecuritiesRepository.findById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getFigi()).get().getPrice() * buySecurityRequest.getValue());
+        if(lastPriceOfSecurityMVCService.checkLastPrice(buySecurityRequest).isPresent()){
+            hashMap.put("price", lastPriceOfSecurityMVCService.checkLastPrice(buySecurityRequest).get().getPrice());
+            hashMap.put("sum", lastPriceOfSecurityMVCService.checkLastPrice(buySecurityRequest).get().getPrice() * buySecurityRequest.getValue());
         }else{
-            hashMap.put("price", additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getId()).getPrice());
-            hashMap.put("sum", additionalStocksInformationRepository.findAddStocksInfoById(securitiesRepository.findByTicker(buySecurityRequest.getTicker()).get().getId()).getPrice() * buySecurityRequest.getValue());
+            hashMap.put("price", additionalStocksInformationMVCService.checkAdditionalStockInfo(buySecurityRequest).getPrice());
+            hashMap.put("sum", additionalStocksInformationMVCService.checkAdditionalStockInfo(buySecurityRequest).getPrice() * buySecurityRequest.getValue());
         }
         return hashMap;
     }

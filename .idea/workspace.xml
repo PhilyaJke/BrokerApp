@@ -10,8 +10,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f161ab6c-c43a-4dde-ba0d-f42b6988400b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/jarFile/BrokerApp-0.0.1-SNAPSHOT.jar" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/BrokerApp.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/aws.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/DAOService/SecuritiesService/SecuritiesDAOService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Repository/BrokeragePortfolioSecuritiesRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Repository/BrokeragePortfolioSecuritiesRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Repository/SecuritiesRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Repository/SecuritiesRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Rest/SecuritiesRestApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Rest/SecuritiesRestApi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Rest/UserRestApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Rest/UserRestApi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Security/SecurityUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/SecurityService/SecurityUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Security/UserDetailsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/SecurityService/UserDetailsServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/SecuritiesService/SecuritiesService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/SecuritiesService/SecuritiesServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/DAOService/SecuritiesService/SecuritiesDAOServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/UserService/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/DAOService/UserService/UserDAOService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/UserService/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/DAOService/UserService/UserDAOServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/TinkoffInvestApi/CacheableLastPrices.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/TinkoffInvestApi/CacheableLastPrices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/TinkoffInvestApi/CheckNewPricesAndTradeableFlag.java" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/TinkoffInvestApi/CheckNewPricesAndTradeableFlag.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/broker-app-backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/broker-app-backend/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,42 +112,32 @@
     </option>
   </component>
   <component name="ProjectId" id="2MzurDLnFdfQt70701iSXUdRZLT" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="ASKED_MARK_IGNORED_FILES_AS_EXCLUDED" value="true" />
-    <property name="DatabaseDriversLRU" value="postgresql" />
-    <property name="DefaultHtmlFileTemplate" value="HTML File" />
-    <property name="Downloaded.Files.Path.Enabled" value="false" />
-    <property name="Repository.Attach.Annotations" value="false" />
-    <property name="Repository.Attach.JavaDocs" value="false" />
-    <property name="Repository.Attach.Sources" value="false" />
-    <property name="RequestMappingsPanelOrder0" value="0" />
-    <property name="RequestMappingsPanelOrder1" value="1" />
-    <property name="RequestMappingsPanelWidth0" value="75" />
-    <property name="RequestMappingsPanelWidth1" value="75" />
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="TODO_SCOPE" value="All Places" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="aspect.path.notification.shown" value="true" />
-    <property name="external.system.task.project.file.to.start" value="$PROJECT_DIR$/broker-app-backend" />
-    <property name="jdk.selected.JAVA_MODULE" value="14" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.12941176" />
-    <property name="project.structure.side.proportion" value="0.2" />
-    <property name="restartRequiresConfirmation" value="false" />
-    <property name="show.run.dashboard.notification" value="false" />
-    <property name="ts.external.directory.path" value="$PROJECT_DIR$/broker-app-frontend/node_modules/typescript/lib" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "last_opened_file_path": "/home/phil/Рабочий стол/BrokerApp/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/MVCService",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
+  }
+}]]></component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/Service/MVCService" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/broker-app-backend/src/main/jarFile" />
       <recent name="$PROJECT_DIR$/broker-app-backend" />
@@ -138,7 +146,7 @@
       <recent name="$PROJECT_DIR$/broker-app-backend/src/main/docker" />
     </key>
   </component>
-  <component name="RunManager" selected="Spring Boot.BrokerAppApplication (1)">
+  <component name="RunManager" selected="Application.BrokerAppApplication">
     <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -146,6 +154,19 @@
         </value>
       </option>
       <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BrokerAppApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="accelerator.group.brokerapp.BrokerAppApplication" />
+      <module name="accelerator.group.BrokerApp.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="accelerator.group.brokerapp.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -169,6 +190,7 @@
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>false</ForceTestExec>
       <method v="2" />
     </configuration>
     <configuration name="/Users/philyaborozdin/Desktop/BrokerApp [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
@@ -190,6 +212,7 @@
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>false</ForceTestExec>
       <method v="2" />
     </configuration>
     <configuration name="/Users/philyaborozdin/Desktop/BrokerApp [init]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
@@ -211,6 +234,7 @@
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>false</ForceTestExec>
       <method v="2" />
     </configuration>
     <configuration name="/Users/philyaborozdin/Desktop/BrokerApp/broker-app-backend [dependencies]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
@@ -232,69 +256,19 @@
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
-      <method v="2" />
-    </configuration>
-    <configuration name="BrokerAppApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-      <module name="BrokerApp.main" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="accelerator.group.brokerapp.BrokerAppApplication" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="BrokerAppApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-      <module name="accelerator.group.BrokerApp.main" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="accelerator.group.brokerapp.BrokerAppApplication" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="SHORTEN_COMMAND_LINE" value="NONE" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Unnamed" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="broker_app" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="BrokerAppApplication" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="SHORTEN_COMMAND_LINE" value="NONE" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="broker-app-backend: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="sourceFilePath" value="broker-app-backend/docker-compose.yml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <configuration name="broker-app-backend.server: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="services">
-            <list>
-              <option value="server" />
-            </list>
-          </option>
-          <option name="sourceFilePath" value="broker-app-backend/docker-compose.yml" />
-        </settings>
-      </deployment>
+      <ForceTestExec>false</ForceTestExec>
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Docker.broker-app-backend: Compose Deployment" />
-      <item itemvalue="Docker.broker-app-backend.server: Compose Deployment" />
+      <item itemvalue="Application.BrokerAppApplication" />
       <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp/broker-app-backend [dependencies]" />
       <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp [build]" />
       <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp [clean]" />
       <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp [init]" />
-      <item itemvalue="Spring Boot.Unnamed" />
-      <item itemvalue="Spring Boot.BrokerAppApplication" />
-      <item itemvalue="Spring Boot.BrokerAppApplication (1)" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Docker.broker-app-backend: Compose Deployment" />
-        <item itemvalue="Docker.broker-app-backend.server: Compose Deployment" />
+        <item itemvalue="Application.BrokerAppApplication" />
         <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp [init]" />
         <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp [clean]" />
         <item itemvalue="Gradle./Users/philyaborozdin/Desktop/BrokerApp [build]" />
@@ -362,37 +336,9 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/WebSockets/UserProfileHandler.java</url>
-          <line>67</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/WebSockets/UserProfileHandler.java</url>
-          <line>55</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/WebSockets/UserProfileHandler.java</url>
-          <line>58</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/WebSockets/UserProfileHandler.java</url>
-          <line>63</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/broker-app-backend/src/main/java/accelerator/group/brokerapp/WebSockets/UserProfileHandler.java</url>
-          <line>57</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

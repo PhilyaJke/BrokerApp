@@ -1,4 +1,4 @@
-package accelerator.group.brokerapp.Security;
+package accelerator.group.brokerapp.Service.SecurityService;
 
 import accelerator.group.brokerapp.Entity.Status;
 import org.springframework.security.core.GrantedAuthority;

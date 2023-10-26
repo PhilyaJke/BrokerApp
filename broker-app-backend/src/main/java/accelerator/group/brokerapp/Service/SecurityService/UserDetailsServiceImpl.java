@@ -1,7 +1,8 @@
-package accelerator.group.brokerapp.Security;
+package accelerator.group.brokerapp.Service.SecurityService;
 
 import accelerator.group.brokerapp.Entity.User;
 import accelerator.group.brokerapp.Repository.UserRepository;
+import accelerator.group.brokerapp.Service.SecurityService.SecurityUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -4,8 +4,8 @@ import accelerator.group.brokerapp.Entity.AdditionalStocksInformation;
 import accelerator.group.brokerapp.Entity.Securities;
 import accelerator.group.brokerapp.Repository.AdditionalStocksInformationRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
-import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
-import com.amazonaws.SdkClientException;
+import accelerator.group.brokerapp.Service.DAOService.SecuritiesService.SecuritiesDAOServiceImpl;
+import accelerator.group.brokerapp.Service.TinkoffInvestApiService.TinkoffInvestApiServiceImpl;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
@@ -24,9 +24,8 @@ import ru.tinkoff.piapi.contract.v1.Share;
 
 import ru.tinkoff.piapi.core.exception.ApiRuntimeException;
 
-import java.io.File;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Component
@@ -34,41 +33,45 @@ import java.util.Objects;
 public class CheckNewPricesAndTradeableFlag{
 
     private final SecuritiesRepository securitiesRepository;
-    private final SecuritiesServiceImpl securitiesService;
+    private final SecuritiesDAOServiceImpl securitiesService;
     private final AdditionalStocksInformationRepository additionalStocksInformationRepository;
+
+    private final TinkoffInvestApiServiceImpl tinkoffInvestApiService;
 
     @Autowired
     public CheckNewPricesAndTradeableFlag(SecuritiesRepository securitiesRepository,
-                                          SecuritiesServiceImpl securitiesService,
-                                          AdditionalStocksInformationRepository additionalStocksInformationRepository) {
+                                          SecuritiesDAOServiceImpl securitiesService,
+                                          AdditionalStocksInformationRepository additionalStocksInformationRepository,
+                                          TinkoffInvestApiServiceImpl tinkoffInvestApiService) {
         this.securitiesRepository = securitiesRepository;
         this.securitiesService = securitiesService;
         this.additionalStocksInformationRepository = additionalStocksInformationRepository;
+        this.tinkoffInvestApiService = tinkoffInvestApiService;
     }
 
     @Async
     @Transactional
     @Scheduled(fixedDelay = 1000000L)
-    protected void addNewSecurities() {
+    protected void addNewSecurities() throws ExecutionException, InterruptedException {
         log.info("Проверка на наличие новых акций");
         String sl = null;
         try {
-            List<Share> shares = securitiesService.returnInvestApiConnection().getInstrumentsService().getTradableSharesSync();
+            List<Share> shares = tinkoffInvestApiService.returnInvestApiConnection().getInstrumentsService().getTradableSharesSync();
             for (Share share : shares) {
                 if (!securitiesRepository.findAllFigiSecurities().contains(share.getFigi())) {
-                    var listFiles = new File("/Users/philyaborozdin/Desktop/icons").listFiles();
-                    for(int i = 0; i < Objects.requireNonNull(listFiles).length; i++){
-                        try {
-                            if(listFiles[i].getName().substring(0, listFiles[i].getName().length()-3).equals(share.getTicker())) {
-                                var s = getAwsCredentials().getObject("securitiesicons", listFiles[i].getName().substring(0, listFiles[i].getName().length() - 3));
-                                if (s != null) {
-                                    sl = s.getObjectContent().getHttpRequest().getURI().toString();
-                                    break;
-                                }
-                            }
-                        }catch (SdkClientException ignored){
-
-                        }
+//                    var listFiles = new File("/Users/philyaborozdin/Desktop/icons").listFiles();
+//                    for(int i = 0; i < Objects.requireNonNull(listFiles).length; i++){
+//                        try {
+//                            if(listFiles[i].getName().substring(0, listFiles[i].getName().length()-3).equals(share.getTicker())) {
+//                                var s = getAwsCredentials().getObject("securitiesicons", listFiles[i].getName().substring(0, listFiles[i].getName().length() - 3));
+//                                if (s != null) {
+//                                    sl = s.getObjectContent().getHttpRequest().getURI().toString();
+//                                    break;
+//                                }
+//                            }
+//                        }catch (SdkClientException ignored){
+//
+//                        }
                     }
 
                     Securities securities = new Securities(
@@ -76,8 +79,8 @@ public class CheckNewPricesAndTradeableFlag{
                             share.getName(),
                             share.getTicker(),
                             share.getCountryOfRisk(),
-                            share.getSector(),
-                            sl
+                            share.getSector()
+//                            sl
                     );
 
                     AdditionalStocksInformation additionalStocksInformation = new AdditionalStocksInformation(
@@ -88,7 +91,7 @@ public class CheckNewPricesAndTradeableFlag{
                     additionalStocksInformationRepository.save(additionalStocksInformation);
                     securitiesRepository.save(securities);
                 }
-            }
+//            }
         }catch (ApiRuntimeException exc){
             addNewSecurities();
             log.trace("какая-то ошибка тинькофф апи");
@@ -101,7 +104,7 @@ public class CheckNewPricesAndTradeableFlag{
         log.info("Проверка цен акций");
         for (int i = 1; i < 8; i += 1) {
             var securities = securitiesRepository.findLimitedSecurities(PageRequest.of(i, 299));
-            var lastprices = securitiesService.returnInvestApiConnection().getMarketDataService().getLastPricesSync(securities);
+            var lastprices = tinkoffInvestApiService.returnInvestApiConnection().getMarketDataService().getLastPricesSync(securities);
             for (ru.tinkoff.piapi.contract.v1.LastPrice lastprice : lastprices) {
                 if (!lastprice.getFigi().isEmpty()) {
                     for (int k = 0; k < securities.size(); k++) {

@@ -3,9 +3,11 @@ package accelerator.group.brokerapp.TinkoffInvestApi;
 import accelerator.group.brokerapp.Entity.LastPriceOfSecurities;
 import accelerator.group.brokerapp.Repository.LastPriceOfSecuritiesRepository;
 import accelerator.group.brokerapp.Repository.SecuritiesRepository;
-import accelerator.group.brokerapp.Service.SecuritiesService.SecuritiesServiceImpl;
+import accelerator.group.brokerapp.Service.DAOService.SecuritiesService.SecuritiesDAOServiceImpl;
+import accelerator.group.brokerapp.Service.TinkoffInvestApiService.TinkoffInvestApiServiceImpl;
 import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -22,14 +24,20 @@ import java.util.function.Consumer;
 public class CacheableLastPrices{
 
     private final SecuritiesRepository securitiesRepository;
-    private final SecuritiesServiceImpl securitiesService;
+    private final SecuritiesDAOServiceImpl securitiesService;
     private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
 
-    public CacheableLastPrices(SecuritiesRepository securitiesRepository, SecuritiesServiceImpl securitiesService,
-                               LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository) {
+    private final TinkoffInvestApiServiceImpl tinkoffInvestApiService;
+
+    @Autowired
+    public CacheableLastPrices(SecuritiesRepository securitiesRepository,
+                               SecuritiesDAOServiceImpl securitiesService,
+                               LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository,
+                               TinkoffInvestApiServiceImpl tinkoffInvestApiService) {
         this.securitiesRepository = securitiesRepository;
         this.securitiesService = securitiesService;
         this.lastPriceOfSecuritiesRepository = lastPriceOfSecuritiesRepository;
+        this.tinkoffInvestApiService = tinkoffInvestApiService;
     }
 
     @Cacheable(value = "LastPrice")
@@ -54,6 +62,7 @@ public class CacheableLastPrices{
                         );
                         lastPriceOfSecuritiesRepository.save(lastPriceOfSecurities);
                     }else {
+                        System.out.println(lastPriceOfSecuritiesRepository.findById(response.getLastPrice().getFigi()).get().getPrice());
                         lastPriceOfSecuritiesRepository.deleteById(response.getLastPrice().getFigi());
                         LastPriceOfSecurities lastPriceOfSecurities = new LastPriceOfSecurities(
                                 response.getLastPrice().getFigi(),
@@ -80,8 +89,8 @@ public class CacheableLastPrices{
             };
             Consumer<Throwable> onErrorCallback = Throwable::printStackTrace;
 
-            for (int i = 1; i < 5; i += 1) {
-                securitiesService.returnInvestApiConnection().getMarketDataStreamService().newStream("new_stream", processor, onErrorCallback).subscribeLastPrices(securitiesRepository.findLimitedSecurities(PageRequest.of(i, 299)));
+            for (int i = 1; i < 3; i += 1) {
+                tinkoffInvestApiService.returnInvestApiConnection().getMarketDataStreamService().newStream("new_stream", processor, onErrorCallback).subscribeLastPrices(securitiesRepository.findLimitedSecurities(PageRequest.of(i, 299)));
             }
 
         }catch (ApiRuntimeException | StatusRuntimeException exc){

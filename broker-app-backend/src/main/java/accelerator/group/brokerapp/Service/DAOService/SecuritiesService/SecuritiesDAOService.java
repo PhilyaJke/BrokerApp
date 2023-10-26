@@ -1,13 +1,15 @@
-package accelerator.group.brokerapp.Service.SecuritiesService;
+package accelerator.group.brokerapp.Service.DAOService.SecuritiesService;
 
-import accelerator.group.brokerapp.Entity.Securities;
+import accelerator.group.brokerapp.Entity.*;
 import accelerator.group.brokerapp.Responses.SecuritiesPageResponse;
 import org.springframework.data.domain.Pageable;
 import ru.tinkoff.piapi.core.InvestApi;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-public interface SecuritiesService {
+public interface SecuritiesDAOService {
 
     SecuritiesPageResponse findAllSecuritiesPage(Pageable pageable);
 
@@ -17,7 +19,7 @@ public interface SecuritiesService {
 
     List<Securities> findSecuritiesByRequest(String request);
 
-    InvestApi returnInvestApiConnection();
+    Securities findSecurityByTicker(String ticker);
+    List<Securities> findAllSecurities();
 
-    List getSecuritiesInfoFromApi(String figi);
 }
