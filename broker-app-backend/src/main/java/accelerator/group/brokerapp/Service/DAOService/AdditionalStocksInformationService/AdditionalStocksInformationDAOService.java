@@ -5,5 +5,5 @@ import accelerator.group.brokerapp.Entity.AdditionalStocksInformation;
 public interface AdditionalStocksInformationDAOService {
 
     AdditionalStocksInformation findAddStocksInfoById(Long id);
-
+    void save(AdditionalStocksInformation additionalStocksInformation);
 }

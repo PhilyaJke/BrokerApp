@@ -5,7 +5,7 @@ import accelerator.group.brokerapp.Service.DAOService.RefreshTokensService.Refre
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("RefreshTokensMVCService")
 public class RefreshTokensMVCServiceImpl extends RefreshTokensDAOServiceImpl implements RefreshTokensMVCService {
     @Autowired
     public RefreshTokensMVCServiceImpl(RefreshTokensRepository refreshTokensRepository) {

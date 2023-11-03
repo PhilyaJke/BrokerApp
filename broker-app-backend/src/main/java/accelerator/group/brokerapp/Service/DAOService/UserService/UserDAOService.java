@@ -13,5 +13,6 @@ public interface UserDAOService {
 
     Optional<User> findByEmail(String email);
 
+    User userProfileInfo(String username);
 
 }

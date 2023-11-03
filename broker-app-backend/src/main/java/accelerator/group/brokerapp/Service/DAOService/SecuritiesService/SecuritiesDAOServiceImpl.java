@@ -5,21 +5,15 @@ import accelerator.group.brokerapp.Repository.*;
 import accelerator.group.brokerapp.Responses.SecuritiesFullInfoResponse;
 import accelerator.group.brokerapp.Responses.SecuritiesPageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.tinkoff.piapi.contract.v1.CandleInterval;
-import ru.tinkoff.piapi.contract.v1.HistoricCandle;
-import ru.tinkoff.piapi.core.InvestApi;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Service
+@Service("SecuritiesDAOService")
 public class SecuritiesDAOServiceImpl implements SecuritiesDAOService {
 
     private final SecuritiesRepository securitiesRepository;
@@ -69,6 +63,31 @@ public class SecuritiesDAOServiceImpl implements SecuritiesDAOService {
     @Override
     public List<Securities> findAllSecurities() {
         return securitiesRepository.findAll();
+    }
+
+    @Override
+    public List<String> findLimitedSecurities(Pageable pageable) {
+        return securitiesRepository.findLimitedSecurities(pageable);
+    }
+
+    @Override
+    public List<String> findAllFigiSecurities() {
+        return securitiesRepository.findAllFigiSecurities();
+    }
+
+    @Override
+    public void save(Securities securities) {
+        securitiesRepository.save(securities);
+    }
+
+    @Override
+    public Securities findSecurityByFigi(String figi) {
+        return securitiesRepository.findSecurityByFigi(figi);
+    }
+
+    @Override
+    public Optional<String> findFigiByTicker(String ticker) {
+        return securitiesRepository.findFigiByTicker(ticker);
     }
 
 }

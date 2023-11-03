@@ -1,9 +1,15 @@
 package accelerator.group.brokerapp.Configuration;
 
-import accelerator.group.brokerapp.Repository.*;
+import accelerator.group.brokerapp.Service.MVCService.AdditionalStocksInformationService.AdditionalStocksInformationMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.BrokeragePortfolioSecuritiesService.BrokeragePortfolioSecuritiesMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.BrokeragePortfolioService.BrokeragePortfolioMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.LastPriceOfSecurityService.LastPriceOfSecurityMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.SecuritiesService.SecuritiesMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.UserService.UserMVCServiceImpl;
 import accelerator.group.brokerapp.WebSockets.WSHandler;
 import accelerator.group.brokerapp.WebSockets.UserProfileHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.*;
@@ -12,26 +18,26 @@ import org.springframework.web.socket.config.annotation.*;
 @EnableWebSocket
 public class WebSocketConfiguration implements WebSocketConfigurer {
 
-    private final AdditionalStocksInformationRepository additionalStocksInformationRepository;
-    private final BrokeragePortfolioRepository brokeragePortfolioRepository;
-    private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
-    private final SecuritiesRepository securitiesRepository;
-    private final UserRepository userRepository;
-    private final BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository;
+    private final AdditionalStocksInformationMVCServiceImpl additionalStocksInformationMVCService;
+    private final BrokeragePortfolioMVCServiceImpl brokeragePortfolioMVCService;
+    private final LastPriceOfSecurityMVCServiceImpl lastPriceOfSecurityMVCService;
+    private final SecuritiesMVCServiceImpl securitiesMVCService;
+    private final UserMVCServiceImpl userMVCService;
+    private final BrokeragePortfolioSecuritiesMVCServiceImpl brokeragePortfolioSecuritiesMVCService;
 
     @Autowired
-    public WebSocketConfiguration(AdditionalStocksInformationRepository additionalStocksInformationRepository,
-                                  BrokeragePortfolioRepository brokeragePortfolioRepository,
-                                  LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository,
-                                  SecuritiesRepository securitiesRepository,
-                                  UserRepository userRepository,
-                                  BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository) {
-        this.additionalStocksInformationRepository = additionalStocksInformationRepository;
-        this.brokeragePortfolioRepository = brokeragePortfolioRepository;
-        this.lastPriceOfSecuritiesRepository = lastPriceOfSecuritiesRepository;
-        this.securitiesRepository = securitiesRepository;
-        this.userRepository = userRepository;
-        this.brokeragePortfolioSecuritiesRepository = brokeragePortfolioSecuritiesRepository;
+    public WebSocketConfiguration(@Qualifier("AdditionalStocksInformationMVCService") AdditionalStocksInformationMVCServiceImpl additionalStocksInformationMVCService,
+                                  @Qualifier("BrokeragePortfolioMVCService") BrokeragePortfolioMVCServiceImpl brokeragePortfolioMVCService,
+                                  @Qualifier("LastPriceOfSecurityMVCService") LastPriceOfSecurityMVCServiceImpl lastPriceOfSecurityMVCService,
+                                  @Qualifier("SecuritiesMVCService") SecuritiesMVCServiceImpl securitiesMVCService,
+                                  @Qualifier("UserMVCService") UserMVCServiceImpl userMVCService,
+                                  @Qualifier("BrokeragePortfolioSecuritiesMVCService") BrokeragePortfolioSecuritiesMVCServiceImpl brokeragePortfolioSecuritiesMVCService){
+        this.additionalStocksInformationMVCService = additionalStocksInformationMVCService;
+        this.brokeragePortfolioMVCService = brokeragePortfolioMVCService;
+        this.lastPriceOfSecurityMVCService = lastPriceOfSecurityMVCService;
+        this.securitiesMVCService = securitiesMVCService;
+        this.userMVCService = userMVCService;
+        this.brokeragePortfolioSecuritiesMVCService = brokeragePortfolioSecuritiesMVCService;
     }
 
     @Override
@@ -45,11 +51,20 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Bean
     public WSHandler myHandler() {
-        return new WSHandler(lastPriceOfSecuritiesRepository, securitiesRepository, additionalStocksInformationRepository);
+        return new WSHandler(
+                lastPriceOfSecurityMVCService,
+                securitiesMVCService,
+                additionalStocksInformationMVCService);
     }
 
     @Bean
     public UserProfileHandler userHandler(){
-        return new UserProfileHandler(lastPriceOfSecuritiesRepository, securitiesRepository, brokeragePortfolioRepository, userRepository, additionalStocksInformationRepository, brokeragePortfolioSecuritiesRepository);
+        return new UserProfileHandler(
+                additionalStocksInformationMVCService,
+                brokeragePortfolioMVCService,
+                lastPriceOfSecurityMVCService,
+                securitiesMVCService,
+                userMVCService,
+                brokeragePortfolioSecuritiesMVCService);
     }
 }

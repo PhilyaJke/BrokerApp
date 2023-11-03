@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service
+@Service("LastPriceOfSecurityDAOService")
 public class LastPriceOfSecurityDAOServiceImpl implements LastPriceOfSecurityDAOService{
 
     private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
@@ -20,5 +20,25 @@ public class LastPriceOfSecurityDAOServiceImpl implements LastPriceOfSecurityDAO
     @Override
     public Optional<LastPriceOfSecurities> findLastPriceOfSecurity(String figi) {
         return lastPriceOfSecuritiesRepository.findById(figi);
+    }
+
+    @Override
+    public boolean existById(String id) {
+        return lastPriceOfSecuritiesRepository.existsById(id);
+    }
+
+    @Override
+    public void save(LastPriceOfSecurities lastPriceOfSecurities) {
+        lastPriceOfSecuritiesRepository.save(lastPriceOfSecurities);
+    }
+
+    @Override
+    public Optional<LastPriceOfSecurities> findById(String figi) {
+        return lastPriceOfSecuritiesRepository.findById(figi);
+    }
+
+    @Override
+    public void deleteById(String figi) {
+        lastPriceOfSecuritiesRepository.deleteById(figi);
     }
 }

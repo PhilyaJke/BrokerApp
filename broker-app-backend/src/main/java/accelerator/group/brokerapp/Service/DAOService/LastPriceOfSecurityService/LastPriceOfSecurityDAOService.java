@@ -8,4 +8,12 @@ public interface LastPriceOfSecurityDAOService {
 
     Optional<LastPriceOfSecurities> findLastPriceOfSecurity(String figi);
 
+    boolean existById(String id);
+
+    void save(LastPriceOfSecurities lastPriceOfSecurities);
+
+    Optional<LastPriceOfSecurities> findById(String figi);
+
+    void deleteById(String figi);
+
 }

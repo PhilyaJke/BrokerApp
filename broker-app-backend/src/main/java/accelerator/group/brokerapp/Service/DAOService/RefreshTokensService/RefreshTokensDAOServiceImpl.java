@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service
+@Service("RefreshTokensDAOService")
 public class RefreshTokensDAOServiceImpl implements RefreshTokensDAOService{
 
     private final RefreshTokensRepository refreshTokensRepository;

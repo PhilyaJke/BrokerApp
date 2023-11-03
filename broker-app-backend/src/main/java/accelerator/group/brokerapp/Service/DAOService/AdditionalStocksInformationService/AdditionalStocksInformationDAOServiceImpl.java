@@ -5,7 +5,7 @@ import accelerator.group.brokerapp.Repository.AdditionalStocksInformationReposit
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("AdditionalStocksInformationDAOService")
 public class AdditionalStocksInformationDAOServiceImpl implements AdditionalStocksInformationDAOService{
 
     private final AdditionalStocksInformationRepository additionalStocksInformationRepository;
@@ -18,5 +18,10 @@ public class AdditionalStocksInformationDAOServiceImpl implements AdditionalStoc
     @Override
     public AdditionalStocksInformation findAddStocksInfoById(Long id) {
         return additionalStocksInformationRepository.findAddStocksInfoById(id);
+    }
+
+    @Override
+    public void save(AdditionalStocksInformation additionalStocksInformation) {
+        additionalStocksInformationRepository.save(additionalStocksInformation);
     }
 }

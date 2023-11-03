@@ -10,9 +10,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Slf4j
-@Service
+@Service("UserDAOService")
 public class UserDAOServiceImpl implements UserDAOService {
-
 
     private final UserRepository userRepository;
 
@@ -34,5 +33,10 @@ public class UserDAOServiceImpl implements UserDAOService {
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public User userProfileInfo(String username) {
+        return userRepository.UserProfileInfo(username);
     }
 }

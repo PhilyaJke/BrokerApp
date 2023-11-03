@@ -2,10 +2,16 @@ package accelerator.group.brokerapp.WebSockets;
 
 import accelerator.group.brokerapp.Entity.LastPriceOfSecurities;
 import accelerator.group.brokerapp.Entity.Securities;
-import accelerator.group.brokerapp.Repository.*;
+import accelerator.group.brokerapp.Service.MVCService.AdditionalStocksInformationService.AdditionalStocksInformationMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.BrokeragePortfolioSecuritiesService.BrokeragePortfolioSecuritiesMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.BrokeragePortfolioService.BrokeragePortfolioMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.LastPriceOfSecurityService.LastPriceOfSecurityMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.SecuritiesService.SecuritiesMVCServiceImpl;
+import accelerator.group.brokerapp.Service.MVCService.UserService.UserMVCServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -22,26 +28,26 @@ import java.util.stream.DoubleStream;
 @Component
 public class UserProfileHandler extends TextWebSocketHandler implements WebSocketHandler {
 
-    private final LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository;
-    private final SecuritiesRepository securitiesRepository;
-    private final BrokeragePortfolioRepository brokeragePortfolioRepository;
-    private final UserRepository userRepository;
-    private final AdditionalStocksInformationRepository additionalStocksInformationRepository;
-    private final BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository;
+    private final LastPriceOfSecurityMVCServiceImpl lastPriceOfSecurityMVCService;
+    private final SecuritiesMVCServiceImpl securitiesMVCService;
+    private final BrokeragePortfolioMVCServiceImpl brokeragePortfolioMVCService;
+    private final UserMVCServiceImpl userMVCService;
+    private final AdditionalStocksInformationMVCServiceImpl additionalStocksInformationMVCService;
+    private final BrokeragePortfolioSecuritiesMVCServiceImpl brokeragePortfolioSecuritiesMVCService;
 
     @Autowired
-    public UserProfileHandler(LastPriceOfSecuritiesRepository lastPriceOfSecuritiesRepository,
-                              SecuritiesRepository securitiesRepository,
-                              BrokeragePortfolioRepository brokeragePortfolioRepository,
-                              UserRepository userRepository,
-                              AdditionalStocksInformationRepository additionalStocksInformationRepository,
-                              BrokeragePortfolioSecuritiesRepository brokeragePortfolioSecuritiesRepository) {
-        this.lastPriceOfSecuritiesRepository = lastPriceOfSecuritiesRepository;
-        this.securitiesRepository = securitiesRepository;
-        this.brokeragePortfolioRepository = brokeragePortfolioRepository;
-        this.userRepository = userRepository;
-        this.additionalStocksInformationRepository = additionalStocksInformationRepository;
-        this.brokeragePortfolioSecuritiesRepository = brokeragePortfolioSecuritiesRepository;
+    public UserProfileHandler(@Qualifier("AdditionalStocksInformationMVCService") AdditionalStocksInformationMVCServiceImpl additionalStocksInformationMVCService,
+                              @Qualifier("BrokeragePortfolioMVCService") BrokeragePortfolioMVCServiceImpl brokeragePortfolioMVCService,
+                              @Qualifier("LastPriceOfSecurityMVCService") LastPriceOfSecurityMVCServiceImpl lastPriceOfSecurityMVCService,
+                              @Qualifier("SecuritiesMVCService") SecuritiesMVCServiceImpl securitiesMVCService,
+                              @Qualifier("UserMVCService") UserMVCServiceImpl userMVCService,
+                              @Qualifier("BrokeragePortfolioSecuritiesMVCService") BrokeragePortfolioSecuritiesMVCServiceImpl brokeragePortfolioSecuritiesMVCService) {
+        this.additionalStocksInformationMVCService = additionalStocksInformationMVCService;
+        this.brokeragePortfolioMVCService = brokeragePortfolioMVCService;
+        this.lastPriceOfSecurityMVCService = lastPriceOfSecurityMVCService;
+        this.securitiesMVCService = securitiesMVCService;
+        this.userMVCService = userMVCService;
+        this.brokeragePortfolioSecuritiesMVCService = brokeragePortfolioSecuritiesMVCService;
     }
 
     @Override
@@ -55,7 +61,7 @@ public class UserProfileHandler extends TextWebSocketHandler implements WebSocke
 
         try {
             String username = findFigiByTicker(session);
-            List<Securities> securities = brokeragePortfolioRepository.findUsersSecuritiesById(userRepository.UserProfileInfo(username).getId());
+            List<Securities> securities = brokeragePortfolioMVCService.findUsersSecuritiesById(userMVCService.userProfileInfo(username).getId());
             while (session.isOpen()) {
 
                 Double price;
@@ -63,17 +69,17 @@ public class UserProfileHandler extends TextWebSocketHandler implements WebSocke
 
                 for (Securities security : securities) {
 
-                    Optional<LastPriceOfSecurities> lastPriceOfSecurities = lastPriceOfSecuritiesRepository.findById(security.getFigi());
+                    Optional<LastPriceOfSecurities> lastPriceOfSecurities = lastPriceOfSecurityMVCService.findById(security.getFigi());
                     //TODO:Переписать на нормальный запрос к бд
-                    var additionalStocksInformation = additionalStocksInformationRepository
-                            .findAddStocksInfoById(securitiesRepository.findSecurityByFigi(security.getFigi()).getId());
+                    var additionalStocksInformation = additionalStocksInformationMVCService
+                            .findAddStocksInfoById(securitiesMVCService.findSecurityByFigi(security.getFigi()).getId());
 
                     if (lastPriceOfSecurities.isPresent()) {
 
                         Double prices = lastPriceOfSecurities.get().getPrice();
-                        var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(
-                                userRepository.UserProfileInfo(username).getId(), securitiesRepository.findSecurityByFigi(security.getFigi()).getId());
-                        price = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get().getCount() * prices;
+                        var portfolio = brokeragePortfolioSecuritiesMVCService.findPortfolioByUserIdAndSecurityId(
+                                userMVCService.userProfileInfo(username).getId(), securitiesMVCService.findSecurityByFigi(security.getFigi()).getId());
+                        price = brokeragePortfolioSecuritiesMVCService.findBrokeragePortfolioSecuritiesByPortfolioId(portfolio.getId()).get().getCount() * prices;
                         if(!checkHashMap.containsKey(security.getTicker())) {
                             checkHashMap.put(security.getTicker(), price);
                         }
@@ -88,9 +94,9 @@ public class UserProfileHandler extends TextWebSocketHandler implements WebSocke
                         }
 
                     } else {
-                        var portfolio = brokeragePortfolioSecuritiesRepository.findPortfolioByUserIdAndSecurityId(
-                                userRepository.UserProfileInfo(username).getId(), securitiesRepository.findSecurityByFigi(security.getFigi()).getId());
-                        price = brokeragePortfolioSecuritiesRepository.findById(portfolio.getId()).get().getCount() * additionalStocksInformation.getPrice();
+                        var portfolio = brokeragePortfolioSecuritiesMVCService.findPortfolioByUserIdAndSecurityId(
+                                userMVCService.userProfileInfo(username).getId(), securitiesMVCService.findSecurityByFigi(security.getFigi()).getId());
+                        price = brokeragePortfolioSecuritiesMVCService.findBrokeragePortfolioSecuritiesByPortfolioId(portfolio.getId()).get().getCount() * additionalStocksInformation.getPrice();
                         if(!checkHashMap.containsKey(security.getTicker())) {
                             checkHashMap.put(security.getTicker(), price);
                             sum = checkHashMap.values().stream().flatMapToDouble(DoubleStream::of).sum();
